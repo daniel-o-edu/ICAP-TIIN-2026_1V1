@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 03 - Consumo Assíncrono e Operação de Consulta (GET)</title>
+    
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset básico e configurações padrão */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f6f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Cabeçalho e Navegação */
+        header {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.2rem;
+            color: #38bdf8;
+        }
+
+        .header-title span {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+
+        nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #38bdf8;
+        }
+
+        /* Conteúdo Principal */
+        main {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.4rem;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: #0369a1;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            color: #475569;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tabelas estilizadas */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+            background-color: #fff;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Blocos de Código e Tags */
+        code {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Caixas de Destaque / Callouts */
+        .callout {
+            background-color: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 1rem 1.25rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .callout-info {
+            background-color: #f0fdf4;
+            border-left-color: #16a34a;
+        }
+
+        /* Botão estilizado */
+        .btn {
+            display: inline-block;
+            background-color: #0284c7;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0369a1;
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        footer p {
+            color: #94a3b8;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header>
+        <div class="header-container">
+            <div class="header-title">
+                <h2>SENAI — Desenvolvimento Web</h2>
+                <span>Situação de Aprendizagem</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#abertura">Abertura</a></li>
+                    <li><a href="#topico1">Tópico 1</a></li>
+                    <li><a href="#topico2">Tópico 2</a></li>
+                    <li><a href="#topico3">Tópico 3</a></li>
+                    <li><a href="#topico4">Tópico 4</a></li>
+                    <li><a href="#topico5">Prática</a></li>
+                    <li><a href="#atividade">Atividade</a></li>
+                    <li><a href="#glossario">Glossário</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <!-- Card de Título / Apresentação -->
+        <section class="card">
+            <h1>Aula 03 - Consumo Assíncrono e Operação de Consulta (GET)</h1>
+            <p><strong>Descrição:</strong> Implementação de requisições assíncronas em JavaScript (<code>fetch</code>, Promises, <code>async/await</code>) para consultar e renderizar dinamicamente os dados de encomendas no painel Front-End.</p>
+        </section>
+
+        <!-- Abertura - Revisão -->
+        <section id="abertura" class="card">
+            <h2>Abertura - Revisão</h2>
+            <p>Antes de seguirmos em frente, vamos relembrar rapidinho o que já construímos nas duas últimas aulas. Essas perguntas podem ser respondidas em voz alta, com a turma toda participando:</p>
+            <ul>
+                <li><strong>O que é uma API?</strong> (Dica: pense no garçom do restaurante da Aula 01.)</li>
+                <li><strong>Qual é a diferença entre Cliente e Servidor</strong> na arquitetura Client-Server?</li>
+                <li><strong>O que uma requisição HTTP carrega?</strong> E uma resposta?</li>
+                <li><strong>O que significam as famílias de status code</strong> 2xx, 4xx e 5xx?</li>
+            </ul>
+            <p>Hoje damos o próximo passo: vamos fazer o JavaScript conversar de verdade com um servidor e atualizar a tela sozinho — sem apertar F5. É exatamente esse comportamento que falta no painel de entregas da nossa Situação de Aprendizagem, que hoje “trava sem retorno ao usuário” quando busca os pedidos. Vamos consertar isso.</p>
+        </section>
+
+        <!-- Tópico 1 -->
+        <section id="topico1" class="card">
+            <h2>Tópico 1 — O Problema do Código Bloqueante</h2>
+            
+            <h3>1.1. A fila única da cantina</h3>
+            <p>Imagine a cantina da escola com um único atendente. Se, para cada pedido, esse atendente precisasse ir até a cozinha, esperar o lanche ficar pronto parado ali, e só depois voltar para atender o próximo aluno da fila, o intervalo inteiro ia travar numa fila enorme.</p>
+            <p>É basicamente assim que o JavaScript funciona: ele é <em>single-threaded</em>, ou seja, só faz uma coisa de cada vez, numa pilha de execução (a Call Stack). Se uma dessas tarefas for lenta — como esperar a resposta de um servidor pela internet — e o código for escrito de forma bloqueante (síncrona), a página inteira congela até a resposta chegar.</p>
+
+            <h3>1.2. Por que isso quebra a experiência do usuário</h3>
+            <p>Voltando ao contexto da nossa Situação de Aprendizagem: o painel de entregas atual trava a tela sem dar retorno ao usuário justamente porque não trata esse tempo de espera de forma adequada. Ninguém quer clicar em “Ver meus pedidos” e ver a tela inteira congelar até a resposta do servidor chegar.</p>
+
+            <h3>1.3. A solução: delegar e ser avisado depois</h3>
+            <p>A solução do navegador é parecida com dar o pedido para a cozinha e continuar atendendo outros alunos: o JavaScript delega a tarefa lenta (a requisição de rede) para as Web APIs do navegador e continua executando o resto do código normalmente. Quando a resposta chegar, um mecanismo chamado Event Loop entrega o resultado de volta para o programa, sem travar nada.</p>
+
+            <div class="callout callout-info">
+                <p><strong>Resumindo em uma frase:</strong> Programação assíncrona não significa que várias coisas acontecem ao mesmo tempo dentro do JavaScript — significa que tarefas lentas são delegadas e o resultado é entregue depois, sem travar a tela.</p>
+            </div>
+        </section>
+
+        <!-- Tópico 2 -->
+        <section id="topico2" class="card">
+            <h2>Tópico 2 — Promises: o Comprovante da Operação</h2>
+            
+            <h3>2.1. A senha do totem de autoatendimento</h3>
+            <p>Pense num totem de autoatendimento de lanchonete: você faz o pedido e, na hora, recebe uma senha (um comprovante) — não o lanche pronto. Essa senha representa uma promessa: em algum momento ela vai virar “lanche pronto” (sucesso) ou, se faltar algum ingrediente, um aviso de “pedido cancelado” (erro).</p>
+            <p>No JavaScript, esse “comprovante” se chama <strong>Promise</strong> (promessa). Toda Promise pode estar em um de três estados:</p>
+            <ul>
+                <li><code>pending</code> (pendente) — a operação ainda não terminou. É a senha na mão, esperando ser chamada.</li>
+                <li><code>fulfilled</code> (realizada) — deu tudo certo, o resultado está disponível.</li>
+                <li><code>rejected</code> (rejeitada) — algo deu errado durante a operação.</li>
+            </ul>
+
+            <h3>2.2. Uma linha do tempo das soluções</h3>
+            <p>Antes das Promises, o JavaScript resolvia tarefas assíncronas com callbacks (funções passadas como parâmetro para serem chamadas quando o dado chegasse). Funcionava, mas em fluxos mais longos o código virava uma verdadeira “escadinha” difícil de ler. As Promises organizaram isso, e o <code>async/await</code> — que veremos a seguir — deixou tudo ainda mais parecido com um código comum, de cima para baixo.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Abordagem</th>
+                            <th>Como funciona (resumo)</th>
+                            <th>Ponto forte</th>
+                            <th>Ponto fraco</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Callback</strong></td>
+                            <td>Passa uma função para ser executada quando o dado chegar</td>
+                            <td>Simples e suportado em qualquer navegador</td>
+                            <td>Muitas funções aninhadas ficam difíceis de ler</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Promise (.then/.catch)</strong></td>
+                            <td>Devolve um objeto que avisa quando a tarefa termina, com sucesso ou erro</td>
+                            <td>Encadeamento mais organizado que o callback</td>
+                            <td>Ainda fica extenso em fluxos com várias etapas</td>
+                        </tr>
+                        <tr>
+                            <td><strong>async / await</strong></td>
+                            <td>Permite escrever código assíncrono parecido com código comum, de cima para baixo</td>
+                            <td>Leitura simples e uso natural do try/catch</td>
+                            <td>Só funciona dentro de uma função declarada como async</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>Repare que cada abordagem não substitui totalmente a anterior — o <code>async/await</code>, que vamos usar o resto da aula, é construído em cima das Promises. Toda função <code>fetch()</code> devolve uma Promise por baixo dos panos.</p>
+        </section>
+
+        <!-- Tópico 3 -->
+        <section id="topico3" class="card">
+            <h2>Tópico 3 — async/await na Prática</h2>
+            <p>A sintaxe <code>async/await</code> é uma forma de “ler” uma Promise como se fosse um código comum, sem precisar encadear vários <code>.then()</code>. Duas palavras-chave fazem toda a mágica:</p>
+            <ul>
+                <li><code>async</code> — colocada antes de <code>function</code>, transforma a função para que ela sempre devolva uma Promise automaticamente.</li>
+                <li><code>await</code> — só pode ser usada dentro de uma função <code>async</code>. Ela pausa a execução daquela função (só dela, o resto da página continua funcionando normalmente) até a Promise ser resolvida.</li>
+            </ul>
+
+            <h3>Exemplo testando no Console do navegador (F12)</h3>
+            <p>Para testar a sintaxe <code>async/await</code> de forma simples e direta sem precisar criar nenhum arquivo HTML ou servidor local, você pode executar o código diretamente no Console do Navegador (DevTools).</p>
+            
+            <ol>
+                <li>
+                    <strong>Abra o Console em qualquer página:</strong>
+                    <ul>
+                        <li>Acesse a página <a href="https://brasilapi.com.br/" target="_blank" rel="noopener">https://brasilapi.com.br/</a> no navegador.</li>
+                        <li>Pressione a tecla <strong>F12</strong> no seu teclado (ou clique com o botão direito na página &gt; Inspecionar).</li>
+                        <li>Selecione a aba <strong>Console</strong> na janela que se abrir.</li>
+                        <li>Para liberar a colagem de código, digite <code>"permitir colar"</code> no console (caso o navegador solicite).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Cole e execute o código:</strong>
+                    <p>Copie o bloco abaixo, cole dentro do Console e pressione Enter:</p>
+<pre><code>async function buscarDados() {
+  const resposta = await fetch("https://brasilapi.com.br/api/ddd/v1/47");
+  const dados = await resposta.json();
+  console.log("Dados da API:", dados);
+}
+
+buscarDados();
+console.log("Essa linha aparece ANTES dos dados, pois a tela não travou!");</code></pre>
+                </li>
+                <li>
+                    <strong>Observe o comportamento assíncrono:</strong>
+                    <ul>
+                        <li>A frase <em>"Essa linha aparece ANTES dos dados..."</em> será impressa imediatamente no console.</li>
+                        <li>Poucos milissegundos depois, quando a internet responder, o objeto contendo as informações da API (cidades do DDD 47) aparecerá na tela.</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <div class="callout callout-info">
+                <p><strong>O que este teste comprova na prática:</strong></p>
+                <ul>
+                    <li><strong>Execução Não-Bloqueante:</strong> A execução do programa continuou normalmente enquanto a requisição de rede era processada.</li>
+                    <li><strong>Uso do await:</strong> O <code>await</code> só congelou o fluxo interno da função <code>buscarDados()</code> até que a requisição terminasse, sem travar a interface nem impedir outras linhas de rodarem.</li>
+                </ul>
+            </div>
+
+            <div class="callout callout-warning">
+                <p><strong>Erro comum:</strong> <code>await</code> só existe dentro de uma função <code>async</code>. Se você tentar usar <code>await</code> "solto" fora de uma função <code>async</code>, o navegador vai acusar erro de sintaxe. Sempre confira o cabeçalho da função antes de usar <code>await</code> dentro dela.</p>
+            </div>
+        </section>
+
+        <!-- Tópico 4 -->
+        <section id="topico4" class="card">
+            <h2>Tópico 4 — A Fetch API e a Operação GET</h2>
+            
+            <h3>4.1. Fazendo a primeira chamada</h3>
+            <p>A Fetch API é a ferramenta padrão do navegador para fazer requisições HTTP. Por padrão, ao chamar <code>fetch(url)</code> sem configurações extras, o navegador realiza uma requisição <strong>GET</strong> — exatamente a operação de Consulta do ciclo CRUD que estamos trabalhando hoje.</p>
+            <p><code>fetch()</code> devolve uma Promise que resolve para um objeto <code>Response</code> — uma espécie de envelope da resposta HTTP. Para ler o conteúdo (o corpo, ou body) desse envelope no formato JSON, chamamos <code>response.json()</code>, que também é assíncrono e devolve outra Promise.</p>
+
+            <h3>4.2. A armadilha do response.ok</h3>
+            <div class="callout callout-warning">
+                <p><strong>Atenção — isso derruba muitos projetos:</strong> A Promise do <code>fetch()</code> SÓ é rejeitada quando há uma falha real de rede (sem internet, servidor fora do ar, bloqueio de CORS). Se o servidor responder normalmente, mesmo que seja com um erro HTTP como 404 ou 500, o <code>fetch</code> considera que "deu certo", porque a mensagem chegou até o navegador!</p>
+            </div>
+            <p>Por isso, é obrigatório verificar manualmente a propriedade <code>response.ok</code> antes de continuar. Lembra dos status codes da Aula 02? <code>response.ok</code> só é <code>true</code> quando o status está entre 200 e 299.</p>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Situação</th>
+                            <th>Status HTTP</th>
+                            <th>response.ok</th>
+                            <th>O que fazer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Deu tudo certo</td>
+                            <td>200</td>
+                            <td><code>true</code></td>
+                            <td>Ler os dados com <code>.json()</code> e mostrar na tela</td>
+                        </tr>
+                        <tr>
+                            <td>Cliente enviou algo errado</td>
+                            <td>400</td>
+                            <td><code>false</code></td>
+                            <td>Avisar o usuário que os dados informados são inválidos</td>
+                        </tr>
+                        <tr>
+                            <td>Rota não existe</td>
+                            <td>404</td>
+                            <td><code>false</code></td>
+                            <td>Avisar que o recurso não foi encontrado</td>
+                        </tr>
+                        <tr>
+                            <td>Servidor apresentou falha</td>
+                            <td>500</td>
+                            <td><code>false</code></td>
+                            <td>Avisar sobre falha temporária e sugerir tentar novamente</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>4.3. Filtrando a consulta com Query Parameters</h3>
+            <p>Lembra da Aula 02, quando vimos que parâmetros de uma requisição GET vão anexados na URL depois do símbolo <code>?</code>? A interface <code>URLSearchParams</code> monta essa parte da URL de forma segura, cuidando automaticamente de espaços e caracteres especiais. Isso será muito útil quando adicionarmos filtros ao nosso painel (por cliente, por status, etc.).</p>
+            <p><strong>Exemplo montando uma URL com filtro:</strong></p>
+<pre><code>const url = new URL("https://api.exemplo.com/encomendas");
+const filtros = new URLSearchParams();
+filtros.append("status", "PENDENTE");
+url.search = filtros.toString();
+
+console.log(url.toString());
+// Saída: https://api.exemplo.com/encomendas?status=PENDENTE</code></pre>
+        </section>
+
+        <!-- Tópico 5 -->
+        <section id="topico5" class="card">
+            <h2>Tópico 5 — Prática Guiada: Construindo o Painel de Encomendas</h2>
+            <p>Agora vamos aplicar tudo o que vimos hoje para começar a construir, de verdade, o painel da nossa Situação de Aprendizagem. Este código será a base que vamos evoluir nas próximas aulas (Criação, Atualização, Exclusão, tratamento de falhas e autenticação).</p>
+
+            <h3>Passo 1 — Preparar o ambiente</h3>
+            <ul>
+                <li>Crie uma pasta chamada <code>painel-encomendas</code>.</li>
+                <li>Dentro dela, crie três arquivos: <code>index.html</code>, <code>app.js</code> e <code>encomendas.json</code>.</li>
+                <li>Abra a pasta no VS Code e instale (se ainda não tiver) a extensão <strong>Live Server</strong>.</li>
+            </ul>
+
+            <div class="callout callout-warning">
+                <p><strong>Por que não posso simplesmente abrir o arquivo clicando duas vezes?</strong><br>
+                Lembra da Aula 02? O <code>fetch</code> precisa de um ambiente de rede (<code>http://</code> ou <code>https://</code>) para funcionar — arquivos abertos direto pelo protocolo <code>file://</code> não executam a arquitetura de comunicação do HTTP corretamente. Por isso vamos usar o Live Server, que cria um servidor local para o nosso projeto.</p>
+            </div>
+
+            <h3>Passo 2 — Montar o HTML base</h3>
+            <p><code>index.html</code></p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-br"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Painel de Encomendas&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Painel de Controle de Entregas&lt;/h1&gt;
+
+  &lt;p id="carregando"&gt;Carregando encomendas...&lt;/p&gt;
+  &lt;p id="erro" style="color: red; display: none;"&gt;&lt;/p&gt;
+
+  &lt;table id="tabela-encomendas" border="1"&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Código&lt;/th&gt;
+        &lt;th&gt;Cliente&lt;/th&gt;
+        &lt;th&gt;Status&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody id="corpo-tabela"&gt;&lt;/tbody&gt;
+  &lt;/table&gt;
+
+  &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+            <h3>Passo 3 — Simular os dados do servidor</h3>
+            <p>Como a API real da empresa de logística ainda não está disponível para testes, vamos simular o servidor com um arquivo JSON local. A estrutura dos dados já é a mesma que usaremos mais adiante com a API de verdade quando ela estiver disponível, basta trocar a URL do fetch.</p>
+            <p><code>encomendas.json</code></p>
+<pre><code>[
+  { "codigoRastreio": "BR001", "clienteNome": "Ana Souza", "status": "EM_TRANSITO" },
+  { "codigoRastreio": "BR002", "clienteNome": "Carlos Lima", "status": "ENTREGUE" },
+  { "codigoRastreio": "BR003", "clienteNome": "Fernanda Dias", "status": "PENDENTE" }
+]</code></pre>
+
+            <h3>Passo 4 — Escrever a função de consulta (GET)</h3>
+            <p>Esta função vai buscar os dados de forma assíncrona, verificar se a resposta foi bem-sucedida e chamar a renderização na tela:</p>
+            <p><code>app.js</code></p>
+<pre><code>const elCarregando = document.getElementById("carregando");
+const elErro = document.getElementById("erro");
+const corpoTabela = document.getElementById("corpo-tabela");
+
+async function consultarEncomendas() {
+  elCarregando.style.display = "block";
+  elErro.style.display = "none";
+  
+  try {
+    const resposta = await fetch("encomendas.json");
+    
+    if (!resposta.ok) {
+      throw new Error("O servidor respondeu com erro: " + resposta.status);
+    }
+    
+    const encomendas = await resposta.json();
+    renderizarTabela(encomendas);
+  } catch (erro) {
+    elErro.textContent = "Não foi possível carregar as encomendas. Tente novamente.";
+    elErro.style.display = "block";
+    console.error(erro);
+  } finally {
+    elCarregando.style.display = "none";
+  }
+}
+
+function renderizarTabela(encomendas) {
+  corpoTabela.innerHTML = ""; // limpa a tabela antes de preencher de novo
+  const fragmento = document.createDocumentFragment();
+
+  encomendas.forEach(encomenda => {
+    const linha = document.createElement("tr");
+    
+    const tdCodigo = document.createElement("td");
+    tdCodigo.textContent = encomenda.codigoRastreio;
+    
+    const tdCliente = document.createElement("td");
+    tdCliente.textContent = encomenda.clienteNome;
+    
+    const tdStatus = document.createElement("td");
+    tdStatus.textContent = encomenda.status;
+    
+    linha.appendChild(tdCodigo);
+    linha.appendChild(tdCliente);
+    linha.appendChild(tdStatus);
+    fragmento.appendChild(linha);
+  });
+
+  corpoTabela.appendChild(fragmento);
+}
+
+consultarEncomendas(); // chama a função assim que a página carrega</code></pre>
+
+            <h3>Passo 5 — Renderizar os dados dinamicamente</h3>
+            <p>Aqui está o coração da atualização dinâmica: em vez de recarregar a página, criamos os elementos da tabela diretamente no DOM com JavaScript. Usamos <code>createElement</code> e <code>textContent</code> — e não <code>innerHTML</code> — como boa prática de segurança sempre que exibimos dados vindos do servidor (aprofundaremos esse cuidado na Aula 07, sobre segurança da informação).</p>
+
+            <h3>Passo 6 — Testar no navegador</h3>
+            <ul>
+                <li>Clique com o botão direito em <code>index.html</code> e selecione <strong>“Open with Live Server”</strong>.</li>
+                <li>Abra o DevTools (F12) e vá até a aba <strong>Network (Rede)</strong>.</li>
+                <li>Recarregue a página e observe a requisição para <code>encomendas.json</code>: confira o método (GET) e o status (200).</li>
+                <li>Confirme que a tabela foi preenchida com os três registros do arquivo JSON.</li>
+                <li><strong>Desafio extra:</strong> renomeie temporariamente o arquivo <code>encomendas.json</code> e recarregue a página — observe o tratamento de erro funcionando.</li>
+            </ul>
+        </section>
+
+        <!-- Atividade Avaliativa -->
+        <section id="atividade" class="card">
+            <h2>Atividade Avaliativa — Checkpoint de Consulta (30 min)</h2>
+            <p>Em duplas, escolham UMA das APIs públicas abaixo (já exploradas na Aula 01) e construam uma pequena página que consulte e exiba os dados dinamicamente na tela, seguindo o mesmo padrão da prática guiada:</p>
+            
+            <ul>
+                <li><strong>BrasilAPI — CEP:</strong> <code>https://brasilapi.com.br/api/cep/v1/{cep}</code></li>
+                <li><strong>BrasilAPI — DDD:</strong> <code>https://brasilapi.com.br/api/ddd/v1/{ddd}</code></li>
+                <li><strong>BrasilAPI — Feriados Nacionais:</strong> <code>https://brasilapi.com.br/api/feriados/v1/{ano}</code></li>
+            </ul>
+
+            <h3>Requisitos mínimos</h3>
+            <ul>
+                <li>Usar <code>fetch()</code> dentro de uma função <code>async</code>, com <code>await</code>.</li>
+                <li>Verificar <code>response.ok</code> antes de tratar o resultado como sucesso.</li>
+                <li>Renderizar o resultado no DOM usando <code>createElement</code> / <code>textContent</code>.</li>
+                <li>Mostrar algum feedback simples de carregamento (ex.: um texto “Carregando...”).</li>
+            </ul>
+
+            <h3>Rubrica de Avaliação</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Critério</th>
+                            <th>Atende Plenamente</th>
+                            <th>Atende Parcialmente</th>
+                            <th>Não Atende</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Uso de fetch + async/await</strong></td>
+                            <td>Implementado corretamente, sem erros de sintaxe</td>
+                            <td>Implementado, mas com pequenos erros</td>
+                            <td>Não implementado ou usa apenas .then() sem justificativa</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Verificação de response.ok</strong></td>
+                            <td>Verifica e trata o erro adequadamente</td>
+                            <td>Verifica, mas não trata o erro</td>
+                            <td>Não verifica</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Renderização dinâmica no DOM</strong></td>
+                            <td>Usa createElement/textContent corretamente</td>
+                            <td>Usa, mas com innerHTML em dados vindos do servidor</td>
+                            <td>Não renderiza dinamicamente</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feedback ao usuário</strong></td>
+                            <td>Mostra estado de carregamento e de erro</td>
+                            <td>Mostra apenas um dos dois</td>
+                            <td>Não mostra nenhum feedback</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p><strong>Entrega:</strong> arquivo HTML + JS (pode ser um único arquivo) enviado no AVA até o final da aula. Este checkpoint compõe a primeira parte do instrumento avaliativo “Código-fonte da interface avaliado por rubrica de funcionalidade”, que será completado com as operações de Criação, Atualização e Exclusão nas Aulas 04 e 05.</p>
+        </section>
+
+        <!-- Fechamento & Glossário -->
+        <section id="glossario" class="card">
+            <h2>Fechamento</h2>
+            <p>Hoje aprendemos a fazer o JavaScript conversar com um servidor sem travar a tela: entendemos por que o código bloqueante é um problema, como as Promises representam operações que ainda vão terminar, como o <code>async/await</code> deixa esse código mais legível, e como usar a Fetch API para realizar a primeira operação do ciclo CRUD — a Consulta (GET).</p>
+            <p><strong>Próxima aula (Aula 04):</strong> Envio de Dados e Operação de Criação (POST). Vamos construir um formulário integrado à API, serializar os dados em JSON e validar o retorno de criação (status 201) — a segunda peça do ciclo CRUD do nosso painel.</p>
+            
+            <div class="callout callout-info">
+                <p><strong>Lembrete:</strong> Guardem bem os arquivos do <code>painel-encomendas</code> construído hoje: eles serão a base para todas as próximas aulas até o Projeto Integrador.</p>
+            </div>
+
+            <h2>Glossário Rápido</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Termo</th>
+                            <th>O que significa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Promise</strong></td>
+                            <td>Um "comprovante" que representa uma operação assíncrona que ainda vai terminar, com sucesso ou erro.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>async</strong></td>
+                            <td>Palavra-chave que transforma uma função para que ela use await e devolva uma Promise automaticamente.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>await</strong></td>
+                            <td>Pausa a execução da função (só ela) até que a Promise seja resolvida.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>fetch()</strong></td>
+                            <td>Função do navegador usada para realizar requisições HTTP.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>endpoint</strong></td>
+                            <td>O endereço específico de um recurso disponibilizado pela API.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>JSON</strong></td>
+                            <td>Formato de texto usado para organizar dados em pares chave/valor.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DOM</strong></td>
+                            <td>Estrutura em árvore que representa a página HTML na memória do navegador.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>response.ok</strong></td>
+                            <td>Propriedade que indica se o status HTTP da resposta está entre 200 e 299.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Query Parameters</strong></td>
+                            <td>Filtros enviados na URL, depois do símbolo <code>?</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; SENAI — Serviço Nacional de Aprendizagem Industrial. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        console.log("Página da Aula 03 carregada com sucesso!");
+    </script>
+
+</body>
+</html>

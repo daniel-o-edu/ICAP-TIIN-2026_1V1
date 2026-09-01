@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 01 — Fundamentos de APIs e Leitura de Documentação Técnica</title>
+<style>
+ body {
+ margin: 0; 
+ padding: 0; 
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ background-color: #f8f9fa; 
+ color: #212529;
+ display: flex; 
+ flex-direction: column; 
+ height: 100vh;
+ overflow: hidden;
+ }
+ .slide-container {
+ width: 95vw;
+ height: 85vh;
+ margin: auto;
+ display: flex; 
+ align-items: center; 
+ justify-content: center;
+ padding: 20px; 
+ box-sizing: border-box; 
+ position: relative;
+ }
+ .slide {
+ display: none; 
+ width: 100%; 
+ max-width: 1200px; 
+ height: 80vh;
+ background: #ffffff; 
+ border-radius: 12px;
+ box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+ padding: 50px;
+ font-size: 24px; 
+ line-height: 1.5; 
+ overflow-y: auto;
+ }
+ .slide.active { 
+ display: block; 
+ animation: fadeIn 0.4s ease-in-out;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(10px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ h1, h2, h3, h4 { 
+ color: #0d6efd; 
+ margin-top: 0; 
+ }
+ code, pre { 
+ background: #e9ecef; 
+ padding: 10px 15px; 
+ border-radius: 8px; 
+ font-family: 'Courier New', Courier, monospace; 
+ display: block; 
+ font-size: 20px;
+ overflow-x: auto;
+ white-space: pre-wrap;
+ }
+ .controls {
+ height: 80px; 
+ background: #ffffff; 
+ border-top: 1px solid #dee2e6;
+ display: flex; 
+ justify-content: space-between; 
+ align-items: center; 
+ padding: 0 50px;
+ }
+ button {
+ background: #0d6efd; 
+ color: white; 
+ border: none; 
+ padding: 12px 25px;
+ font-size: 18px; 
+ border-radius: 8px; 
+ cursor: pointer;
+ transition: background 0.2s;
+ }
+ button:hover {
+ background: #0b5ed7;
+ }
+ button:disabled { 
+ background: #adb5bd; 
+ cursor: not-allowed; 
+ }
+ .progress { 
+ font-size: 20px; 
+ font-weight: bold; 
+ color: #495057;
+ }
+ .slide-label { font-weight: bold; text-transform: uppercase; color: #6c757d; margin-bottom: 20px; font-size: 18px; letter-spacing: 1px; }
+ .callout { padding: 20px 30px; border-radius: 8px; margin: 20px 0; border-left: 8px solid; }
+ .callout.blue { background: #cce5ff; border-color: #004085; color: #004085; }
+ .callout.green { background: #d4edda; border-color: #155724; color: #155724; }
+ .callout.red { background: #f8d7da; border-color: #721c24; color: #721c24; }
+ .callout.yellow { background: #fff3cd; border-color: #856404; color: #856404; }
+ .section-header { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+ .section-num { font-size: 80px; font-weight: bold; color: #e9ecef; margin-bottom: -20px; }
+ .section-header h2 { font-size: 48px; color: #0d6efd; margin-bottom: 20px; }
+ img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; border: 1px solid #dee2e6; }
+ table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 20px; }
+ th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
+ th { background-color: #e9ecef; color: #0d6efd; }
+</style>
+</head>
+<body>
+ <div class="slide-container" id="slides">
+
+ <div class="slide active">
+ <div class="slide-label">Aula 01</div>
+ <h1>Aula 01 — Fundamentos de APIs e Leitura de Documentação Técnica</h1>
+ <p><strong>Descrição:</strong> Nesta aula de abertura, os estudantes exploram a arquitetura Cliente-Servidor e o conceito de API por meio da analogia didática do garçom e do restaurante. Na sequência, aprendem a interpretar documentações técnicas padronizadas (Swagger/OpenAPI e Redoc), identificando rotas, métodos HTTP, parâmetros e respostas em formato JSON. A aula é finalizada com uma prática guiada de testes reais no navegador utilizando a BrasilAPI e a atividade investigativa "Exploradores de APIs".</p>
+ <p>Nesta primeira etapa da nossa Aula 01, vamos entender o propósito desta Unidade Curricular, como ela se conecta com a formação de vocês e quais conhecimentos seremos capazes de dominar ao longo das nossas aulas.</p>
+ </div>
+ 
+ <div class="slide">
+ <h2>1. Visão Geral da Unidade Curricular</h2>
+ <ul>
+ <li><strong>Nome da UC:</strong> Interação com APIs.</li>
+ <li><strong>Carga Horária Total:</strong> 40 horas (11 aulas).</li>
+ <li><strong>Objetivo Geral:</strong> Desenvolver capacidades técnicas e socioemocionais para que vocês consigam construir aplicações Front-End capazes de consumir serviços do servidor e exibir dados de forma dinâmica e segura para o usuário.</li>
+ <li><strong>Função Profissional:</strong> Esta UC integra o perfil profissional para produzir interfaces web com padrões de qualidade, usabilidade, interatividade, robustez e segurança da informação.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>2. Conhecimentos da Unidade Curricular (Parte 1)</h2>
+ <p>Ao longo das nossas 11 aulas, exploraremos um conjunto de conteúdos fundamentais para a integração de sistemas web. Abaixo está o resumo de todos os conhecimentos que faremos parte do nosso aprendizado:</p>
+ <h3>● Serviços Server-Side e Documentação de APIs:</h3>
+ <ul>
+ <li>Estudo e leitura de documentações técnicas de APIs públicas (modelos, componentes e mensagens de retorno).</li>
+ <li>Utilização de ferramentas e padrões de mercado, como Swagger/OpenAPI e Postman Docs.</li>
+ </ul>
+ <h3>● Protocolo HTTP e Ciclo de Operações (CRUD):</h3>
+ <ul>
+ <li>Entendimento da estrutura de mensagens HTTP (headers, body JSON e códigos de status 2xx a 5xx).</li>
+ <li>Operação de Consulta (GET) com requisições assíncronas em JavaScript (fetch, Promises e async/await).</li>
+ <li>Operação de Criação (POST) com envio de dados serializados em JSON.</li>
+ <li>Operações de Atualização e Exclusão de registros (PUT, PATCH e DELETE) sincronizados na interface.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>2. Conhecimentos da Unidade Curricular (Parte 2)</h2>
+ <h3>● Tratamento de Falhas e Resiliência:</h3>
+ <ul>
+ <li>Captura de exceções e tratamento defensivo de erros (try/catch) no lado do cliente.</li>
+ <li>Feedback visual e amigável ao usuário em casos de instabilidade ou falhas de rede.</li>
+ </ul>
+ <h3>● Segurança da Informação e Autenticação:</h3>
+ <ul>
+ <li>Compreensão dos três pilares da segurança: Integridade, Disponibilidade e Confidencialidade.</li>
+ <li>Práticas de controle de acesso, criptografia, auditoria e backups.</li>
+ <li>Implementação de fluxo de login com autenticação JWT (JSON Web Token) e envio no cabeçalho Authorization: Bearer.</li>
+ </ul>
+ <h3>● Desenvolvimento Prático e Projeto Integrador:</h3>
+ <ul>
+ <li>Mapeamento de endpoints e desenvolvimento de um painel funcional (Situação de Aprendizagem).</li>
+ <li>Planejamento, codificação, testes e apresentação de um projeto completo integrando Front-End e APIs.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>2. Conhecimentos da Unidade Curricular (Parte 3)</h2>
+ <h3>● Autogestão e Atitudes Socioemocionais:</h3>
+ <ul>
+ <li>Atitude proativa, disciplina e organização para solução de problemas complexos de software.</li>
+ <li>Trabalho em equipe, escuta ativa e fundamentação de decisões técnicas baseadas em evidências.</li>
+ </ul>
+ <div class="callout blue">
+ <strong>Pronto para o próximo passo?</strong><br>
+ Esta foi a nossa introdução geral à Unidade Curricular. Na sequência da aula, iniciaremos o nosso conteúdo técnico explorando a Arquitetura Cliente-Servidor e a Leitura de Documentações de APIs.
+ </div>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">T1</div>
+ <h2>Tópico 1: Conceitos Fundamentais de Comunicação Web</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>1. O que é uma API? (Application Programming Interface)</h2>
+ <h3>1.1. Definição e Conceito Geral</h3>
+ <ul>
+ <li><strong>Significado da Sigla:</strong> Application Programming Interface (Interface de Programação de Aplicação).</li>
+ <li><strong>Definição Geral:</strong> É um conjunto de regras, padrões, especificações e protocolos de programação que permite a comunicação e a troca de dados entre dois ou mais sistemas de software distintos, sem que um precise conhecer a implementação interna do outro.</li>
+ <li><strong>Perspectiva de Sistemas Distribuídos:</strong> Em arquiteturas de rede, as APIs atuam como conectores que mediam a comunicação e a transferência de representações de dados entre diferentes componentes de software.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>1.2. Analogia Didática: O Garçom e o Restaurante</h2>
+ <ul>
+ <li><strong>💻 O Cliente (Usuário / Aplicação):</strong> Representa o cliente no restaurante consultando o cardápio e fazendo o pedido.</li>
+ <li><strong>💁‍♂️ A API (O Garçom):</strong> Atua como o intermediário que recebe o pedido do cliente, leva a solicitação até a cozinha e traz o prato pronto de volta.</li>
+ <li><strong>🍳 O Servidor (A Cozinha):</strong> É o sistema centralizado que recebe a ordem, processa a solicitação e consulta a base de dados para preparar a resposta.</li>
+ </ul>
+ <pre><code>[ 💻 Cliente / Front-End ] ──( Faz o Pedido )──> [ 💁‍♂️ API / Garçom ] ──> [ 🍳 Servidor / Cozinha ]
+[ 💻 Cliente / Front-End ] <──( Entrega a Resposta )── [ 💁‍♂️ API / Garçom ] <── [ 🍳 Servidor / Cozinha ]</code></pre>
+ </div>
+
+ <div class="slide">
+ <h2>1.3. O Papel da API no Modelo Cliente-Servidor</h2>
+ <ul>
+ <li><strong>Intermediária Desacoplada:</strong> A API estabelece uma ponte padronizada de comunicação via protocolo HTTP/HTTPS entre a interface Front-End e os serviços do Back-End.</li>
+ <li><strong>Contrato de Serviço:</strong> A API estabelece formalmente quais solicitações (requests) o servidor aceita.</li>
+ <li><strong>Padronização de Envio:</strong> Define como os dados devem ser enviados, especificando parâmetros, cabeçalhos e corpo (payload) em formatos como JSON ou XML.</li>
+ <li><strong>Estruturação de Resposta:</strong> Garante a previsibilidade da estrutura das mensagens de resposta (responses) do servidor.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>1.4. Principais Objetivos e Benefícios</h2>
+ <ul>
+ <li><strong>Reutilização e Eficiência:</strong> Permite reaproveitar dados e regras de negócio sem recriar funcionalidades do zero, tais como integrações com gateways de pagamento ou mapas.</li>
+ <li><strong>Segurança e Abstração:</strong> Funciona como uma camada de proteção, expondo apenas os dados estritamente necessários e mantendo a base de dados e as regras internas protegidas.</li>
+ <li><strong>Manutenibilidade:</strong> Mudanças na estrutura interna do servidor não quebram o código do cliente, desde que a interface gráfica respeite o contrato estabelecido pela API.</li>
+ </ul>
+ <h3>1.5. Tipos de Acesso às APIs</h3>
+ <ul>
+ <li><strong>Públicas (Abertas):</strong> Acessíveis a qualquer desenvolvedor ou aplicação externa, como APIs de previsão do tempo, consulta de CEP ou moedas.</li>
+ <li><strong>Privadas (Internas):</strong> Utilizadas exclusivamente dentro da infraestrutura de uma organização para integrar microssistemas ou sistemas legados.</li>
+ <li><strong>Parceiras (Partner APIs):</strong> Expostas com controle de acesso restrito e autenticado para empresas parceiras homologadas.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>2. Fundamentos da Arquitetura Cliente-Servidor (Client/Server)</h2>
+ <h3>2.1. O Princípio da Separação de Responsabilidades</h3>
+ <ul>
+ <li><strong>Definição da Arquitetura:</strong> É um modelo de computação distribuída que divide o processamento entre dois papéis principais: quem solicita a informação/serviço e quem processa e responde com a informação.</li>
+ <li><strong>Separação de Responsabilidades (Separation of Concerns):</strong> A arquitetura isola as preocupações associadas à interface gráfica das preocupações de armazenamento e processamento de dados.</li>
+ <li><strong>Evolução Independente:</strong> Esta separação permite que a camada de apresentação seja alterada sem impactar a persistência dos dados, ou que a infraestrutura de dados seja modificada sem quebrar a experiência do usuário.</li>
+ <li><strong>Gestão de Complexidade:</strong> Reduz a complexidade do sistema ao estabelecer limites operacionais claros entre os componentes conectados na rede.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>2.2. Os Dois Papéis Principais</h2>
+ <table>
+ <tr>
+ <th>Papel</th>
+ <th>Conceito</th>
+ <th>Responsabilidades do Sistema</th>
+ <th>Exemplos Práticos</th>
+ </tr>
+ <tr>
+ <td><strong>💻 Cliente (Client-side)</strong></td>
+ <td>A interface com a qual o usuário interage diretamente.</td>
+ <td>• Capturar interações do usuário.<br>• Disparar solicitações de dados.<br>• Renderizar e exibir informações na tela.</td>
+ <td>Navegadores Web (Chrome, Firefox), aplicativos móveis e programas desktop. Melhora a portabilidade da interface entre plataformas.</td>
+ </tr>
+ <tr>
+ <td><strong>️ Servidor (Server-side)</strong></td>
+ <td>O sistema centralizado que armazena recursos e regras.</td>
+ <td>• Processar regras de negócio.<br>• Consultar e manipular o Banco de Dados.<br>• Validar permissões e autenticação.</td>
+ <td>Servidores Node.js, Python, Java, Apache e Bancos de Dados Relacionais. Simplifica o processamento na ponta.</td>
+ </tr>
+ </table>
+ </div>
+
+ <div class="slide">
+ <h2>2.3. O Ciclo da Comunicação: Request e Response</h2>
+ <pre><code>1. Requisição (Request) ===>
+[ 💻 Cliente ]                  [ ️ Servidor ]
+                 <=== 2. Resposta (Response)</code></pre>
+ <ol>
+ <li><strong>Requisição (Request):</strong> O cliente dispara uma mensagem formatada pedindo dados ou uma operação específica (ex.: "Servidor, envie a lista de entregas da minha conta").</li>
+ <li><strong>Processamento:</strong> O servidor recebe a mensagem, autentica a requisição, aplica as regras de negócio e executa a consulta no banco de dados.</li>
+ <li><strong>Resposta (Response):</strong> O servidor envia uma resposta com os dados no formato combinado ou relata um erro de processamento (ex.: "Aqui estão os dados" ou "Acesso negado").</li>
+ </ol>
+ </div>
+
+ <div class="slide">
+ <h2>2.4. Vantagens Estruturais da Arquitetura</h2>
+ <ul>
+ <li><strong>Segurança e Centralização:</strong> Os dados sensíveis e as regras de negócio permanecem protegidos no servidor, inacessíveis diretamente do navegador.</li>
+ <li><strong>Escalabilidade:</strong> O servidor e a interface gráfica podem evoluir e expandir de forma isolada, otimizando o uso dos recursos computacionais.</li>
+ <li><strong>Reutilização:</strong> Uma mesma API centralizada pode atender simultaneamente a um site web, um app mobile e um painel de administração.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>3. Momento de Interatividade: Teste de Entendimento</h2>
+ <div class="callout yellow">
+ <p><strong>Cenário do Exercício:</strong> Imagine que um usuário esteja em um e-commerce de logística e clique no botão "Ver meus pedidos".</p>
+ <p><strong>Pergunta para a Turma:</strong> O que acontece na arquitetura Cliente-Servidor nesse exato instante? Qual é a função do Cliente e qual é a função do Servidor?</p>
+ </div>
+ <ul>
+ <li><strong>Atuação do Cliente (Front-End):</strong> Captura o evento do clique, constrói a requisição HTTP pedindo a lista de pedidos do usuário e envia via API. Ao receber a resposta, renderiza a lista na tela.</li>
+ <li><strong>Atuação do Servidor (Back-End):</strong> Recebe o pedido, confirma se o usuário tem permissão para visualizar aquela conta, busca os registros de compras no Banco de Dados e retorna uma lista formatada em JSON.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">T2</div>
+ <h2>Tópico 2: Exploração e Leitura de Documentação Técnica</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>1. Por que a Documentação é a "Bússola" do Desenvolvedor?</h2>
+ <h3>1.1. A Analogia do Manual de Instruções</h3>
+ <ul>
+ <li>Imagine tentar montar um móvel complexo ou um brinquedo repleto de engrenagens sem nenhum manual: o resultado provável é frustração, peças encaixadas no lugar errado e perda de tempo.</li>
+ <li>Tentar integrar ou consumir uma API sem consultar a sua documentação técnica é exatamente o mesmo que programar "no escuro".</li>
+ <li>A documentação técnica é o contrato formal entre o desenvolvedor e o servidor, especificando com clareza o que pedir, como pedir e o que esperar como resposta.</li>
+ </ul>
+ <h3>1.2. O Custo de Programar "No Escuro"</h3>
+ <ul>
+ <li><strong>Erros de Requisição:</strong> Falta de clareza gera estruturas malformadas de dados enviadas ao servidor.</li>
+ <li><strong>Perda de Produtividade:</strong> Testes de tentativa e erro consomem tempo útil de desenvolvimento.</li>
+ <li><strong>Tratamento Falho de Exceções:</strong> Sem conhecer os códigos de erro do servidor, a interface gráfica não consegue exibir mensagens amigáveis ao usuário.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>2. Padrões e Ferramentas de Documentação do Mercado</h2>
+ <p>No mercado de desenvolvimento de software, duas abordagens principais se destacam para documentar interfaces RESTful:</p>
+ <table>
+ <tr>
+ <th>Ferramenta / Padrão</th>
+ <th>O que é?</th>
+ <th>Ponto Forte Didático / Operacional</th>
+ </tr>
+ <tr>
+ <td><strong>📄 Swagger / OpenAPI Specification (OAS)</strong></td>
+ <td>Um padrão universal e aberto para descrever e estruturar APIs REST. O Swagger UI gera uma interface visual interativa em cima desse padrão.</td>
+ <td>Permite testar requisições diretamente na própria página da documentação por meio do botão Try it out.</td>
+ </tr>
+ <tr>
+ <td><strong>🟧 Postman Docs</strong></td>
+ <td>Documentação gerada automaticamente a partir de coleções de requisições (collections) criadas no software Postman.</td>
+ <td>Apresenta exemplos de código prontos e funcionais em diversas linguagens de programação (JavaScript, Python, cURL, etc.).</td>
+ </tr>
+ </table>
+ </div>
+
+ <div class="slide">
+ <h2>3. Anatomia Visual: Os 4 Componentes Indispensáveis</h2>
+ <p>Ao abrir qualquer documentação técnica de API, o desenvolvedor deve buscar imediatamente quatro componentes vitais de mapeamento:</p>
+ <ul>
+ <li>📍 1. Endpoints e Métodos HTTP (Rotas e Ações)</li>
+ <li>⚙️ 2. Parâmetros da Requisição (Path, Query, Headers)</li>
+ <li>📦 3. Modelo de Dados e Payload Body (Estrutura JSON)</li>
+ <li>💬 4. Cenários de Respostas (Status Codes & Responses)</li>
+ </ul>
+ <h3>1. 📍 Endpoints e Métodos HTTP</h3>
+ <ul>
+ <li><strong>Endpoint (Rota):</strong> O endereço/caminho da URL onde o recurso está localizado no servidor (ex.: /api/cep/v1).</li>
+ <li><strong>Método HTTP (Verbo):</strong> A ação semântica que indica a intenção do cliente (ex.: GET para consultar ou POST para criar).</li>
+ </ul>
+ <h3>2. ⚙️ Parâmetros da Requisição (Parameters)</h3>
+ <ul>
+ <li><strong>Path Parameters:</strong> Identificadores obrigatórios inseridos diretamente na estrutura da URL (ex.: /api/cep/v1/{cep}).</li>
+ <li><strong>Query Parameters:</strong> Filtros ou modificadores opcionais anexados ao final da URL após o símbolo ? (ex.: /encomendas?status=Pendente).</li>
+ <li><strong>Headers (Cabeçalhos):</strong> Metadados de contexto da requisição, como formato de dados ou chaves de autenticação (ex.: Content-Type: application/json).</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>3. Anatomia Visual (Continuação)</h2>
+ <h3>3. 📦 Modelo de Dados e Payload Body</h3>
+ <ul>
+ <li>Refere-se à estrutura e tipagem do objeto (geralmente em formato JSON) transmitido no corpo (body) da requisição, especialmente em operações de criação (POST) e atualização (PUT/PATCH).</li>
+ </ul>
+ <h3>4. 💬 Cenários de Respostas (Responses & Status Codes)</h3>
+ <p>O mapa do que o servidor retorna tanto em casos de sucesso quanto em casos de falha:</p>
+ <ul>
+ <li><strong>200 OK / 201 Created:</strong> A solicitação foi processada com sucesso.</li>
+ <li><strong>400 Bad Request:</strong> Dados enviados pelo cliente estão incorretos ou malformatados.</li>
+ <li><strong>404 Not Found:</strong> O recurso ou endereço solicitado não existe no servidor.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>Passo a Passo Guiado: Explorando a BrasilAPI 🇧🇷 (Parte 1)</h2>
+ <p>Este guia prático foi feito para orientar você, passo a passo, no uso do navegador web para explorar e testar a documentação de uma API de forma interativa.</p>
+ <h3>Passo 1: Abrir o Navegador e cessar a Documentação Técnica da BrasilAPI</h3>
+ <ul>
+ <li><strong>O que fazer:</strong> Clique na barra de endereços do seu navegador, digite o link https://brasilapi.com.br/docs e aperte a tecla Enter.</li>
+ <li><strong>O que você verá na tela:</strong> A página oficial da BrasilAPI, estruturada no padrão visual Swagger UI / OpenAPI. Você verá um índice com vários serviços disponíveis (CEP, CNPJ, DDD, Feriados, etc.).</li>
+ </ul>
+ <h3>Passo 2: Localizar o Serviço de Busca de CEP</h3>
+ <ul>
+ <li><strong>O que fazer:</strong> Role a página para baixo até encontrar o bloco rotulado como cep-v1 ou CEP.</li>
+ <li><strong>Identificando os componentes na tela:</strong>
+ <ul>
+ <li><strong>O Verbo HTTP:</strong> Observe a caixa colorida em azul com o texto GET. O verbo GET indica que este serviço serve apenas para consultar dados.</li>
+ <li><strong>O Endpoint (Rota):</strong> Ao lado do botão azul, você verá o caminho /api/cep/v1/{cep}. Isso mostra o endereço do servidor onde a informação do CEP está guardada.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>Passo a Passo Guiado: Explorando a BrasilAPI 🇧🇷 (Parte 2)</h2>
+ <h3>Passo 3: Como Testar no Navegador</h3>
+ <p><strong>Teste direto na Barra de Endereços do Navegador</strong></p>
+ <ol>
+ <li>Abra uma nova aba no seu navegador.</li>
+ <li>Digite a URL do serviço juntamente com a rota e o CEP de teste: (https://brasilapi.com.br/api/cep/v1/89201000).</li>
+ <li>Aperte Enter. O navegador fará a requisição GET real ao servidor e exibirá a resposta em JSON na tela.</li>
+ <li>Para testar o erro 404, mude os números no final da URL para um CEP inexistente: (https://brasilapi.com.br/api/cep/v1/99999999).</li>
+ </ol>
+ </div>
+
+ <div class="slide">
+ <h2>Passo a Passo Guiado: Explorando a BrasilAPI 🇧🇷 (Parte 3)</h2>
+ <h3>Passo 4: Analisar a Resposta de Sucesso (Response Body JSON)</h3>
+ <ul>
+ <li><strong>O que fazer:</strong> Role a página um pouco para baixo até a seção Responses (Respostas).</li>
+ <li><strong>Interpretando os resultados:</strong>
+ <ul>
+ <li><strong>Server Response Code:</strong> Você verá o código 200. O código 200 OK significa que o pedido foi processado com sucesso.</li>
+ <li><strong>Response Body (Corpo da Resposta):</strong> Você verá um bloco de texto formatado como um objeto JSON:</li>
+ </ul>
+ </li>
+ </ul>
+ <pre><code>{
+"cep": "89201000",
+"state": "SC",
+"city": "Joinville",
+"neighborhood": "Centro",
+"street": "Rua do Príncipe"
+}</code></pre>
+ <ul>
+ <li><strong>Entendendo a estrutura do JSON:</strong>
+ <ul>
+ <li>Cada linha contém uma chave entre aspas à esquerda (ex: "city") e o seu respectivo valor à direita (ex: "Joinville").</li>
+ <li>É exatamente essa estrutura textual que o nosso programa em JavaScript vai ler e transformar nos textos que o usuário enxerga na tela do site!</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>Passo a Passo Guiado: Explorando a BrasilAPI 🇧🇷 (Parte 4)</h2>
+ <h3>Passo 5: Simular e Testar Cenários de Erro</h3>
+ <p>Para entender como a API se comporta quando algo dá errado, faremos dois novos testes:</p>
+ <h4>Teste A: CEP inexistente</h4>
+ <ol>
+ <li>No mesmo campo do parâmetro {cep}, apague o número e digite 99999999 (formato numérico válido de 8 dígitos, mas que não existe no Brasil).</li>
+ <li>Clique em Execute.</li>
+ <li>Resultado: O código retornado será 404 Not Found, e a mensagem no JSON explicará que o CEP não foi encontrado na base de dados.</li>
+ </ol>
+ <h4>Teste B: Formato de CEP Inválido</h4>
+ <ol>
+ <li>Digite no campo do parâmetro a palavra abc ou um número incompleto como 123.</li>
+ <li>Clique em Execute.</li>
+ <li>Resultado: O código retornado será 400 Bad Request, indicando que a requisição enviada pelo cliente está incorreta ou fora do formato esperado.</li>
+ </ol>
+ </div>
+
+ <div class="slide">
+ <h2>Resumo dos Códigos Aprendidos no Teste</h2>
+ <table>
+ <tr>
+ <th>Código HTTP</th>
+ <th>Significado</th>
+ <th>O que indica no teste?</th>
+ </tr>
+ <tr>
+ <td><strong>200 OK</strong></td>
+ <td>Sucesso</td>
+ <td>CEP encontrado e dados retornados em JSON.</td>
+ </tr>
+ <tr>
+ <td><strong>400 Bad Request</strong></td>
+ <td>Erro do Cliente</td>
+ <td>CEP enviado em formato incorreto (letras ou dígitos incompletos).</td>
+ </tr>
+ <tr>
+ <td><strong>404 Not Found</strong></td>
+ <td>Não Encontrado</td>
+ <td>CEP possui formato numérico válido, mas não existe no banco de dados.</td>
+ </tr>
+ </table>
+ </div>
+
+ <div class="slide">
+ <h2>Atividade Interativa: "Exploradores de APIs" 🎯</h2>
+ <p>Agora é a hora de exercitar a leitura técnica da documentação com três desafios curtos em sala de aula:</p>
+ <div class="callout green">
+ <strong>🔍 Desafio 1: Busca de CNPJ</strong><br>
+ <strong>Missão:</strong> Acesse a documentação da BrasilAPI e identifique qual é o método HTTP e qual é a rota exata (endpoint) utilizada para consultar os dados cadastrais de um CNPJ.
+ </div>
+ <div class="callout blue">
+ <strong>🔍 Desafio 2: Leitura de Status de DDD</strong><br>
+ <strong>Missão:</strong> Localize o serviço de busca por DDD na documentação e identifique qual é o código de status HTTP retornado quando o DDD digitado não existe no Brasil.
+ </div>
+ <div class="callout yellow">
+ <strong>🔍 Desafio 3: Mapeamento de Payload de Feriados</strong><br>
+ <strong>Missão:</strong> Encontre o endpoint de Feriados Nacionais e liste quais campos de informação o servidor devolve para cada feriado retornado na lista JSON.
+ </div>
+ </div>
+
+ </div>
+
+ <div class="controls">
+ <button id="prevBtn" onclick="prevSlide()" disabled>Anterior</button>
+ <div class="progress"><span id="current">1</span> / <span id="total"></span></div>
+ <button id="nextBtn" onclick="nextSlide()">Próximo</button>
+ </div>
+
+ <script>
+ let currentSlideIndex = 0;
+ const slides = document.querySelectorAll('.slide');
+ const totalSlides = slides.length;
+ const currentIndicator = document.getElementById('current');
+ const totalIndicator = document.getElementById('total');
+ const prevBtn = document.getElementById('prevBtn');
+ const nextBtn = document.getElementById('nextBtn');
+
+ totalIndicator.textContent = totalSlides;
+
+ function updateView() {
+ slides.forEach((slide, index) => {
+ slide.classList.remove('active');
+ if (index === currentSlideIndex) {
+ slide.classList.add('active');
+ }
+ });
+ currentIndicator.textContent = currentSlideIndex + 1;
+ 
+ prevBtn.disabled = currentSlideIndex === 0;
+ nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+ }
+
+ function nextSlide() {
+ if (currentSlideIndex < totalSlides - 1) {
+ currentSlideIndex++;
+ updateView();
+ }
+ }
+
+ function prevSlide() {
+ if (currentSlideIndex > 0) {
+ currentSlideIndex--;
+ updateView();
+ }
+ }
+
+ document.addEventListener('keydown', (e) => {
+ if (e.key === 'ArrowRight' || e.key === 'PageDown') nextSlide();
+ if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+ });
+ </script>
+</body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 02 - Protocolo HTTP e Mensagens de Retorno</title>
+<style>
+ body {
+ margin: 0; 
+ padding: 0; 
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ background-color: #f8f9fa; 
+ color: #212529;
+ display: flex; 
+ flex-direction: column; 
+ height: 100vh;
+ overflow: hidden;
+ }
+ .slide-container {
+ width: 95vw;
+ height: 85vh;
+ margin: auto;
+ display: flex; 
+ align-items: center; 
+ justify-content: center;
+ padding: 20px; 
+ box-sizing: border-box; 
+ position: relative;
+ }
+ .slide {
+ display: none; 
+ width: 100%; 
+ max-width: 1200px; 
+ height: 80vh;
+ background: #ffffff; 
+ border-radius: 12px;
+ box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+ padding: 50px;
+ font-size: 24px; 
+ line-height: 1.5; 
+ overflow-y: auto;
+ }
+ .slide.active { 
+ display: block; 
+ animation: fadeIn 0.4s ease-in-out;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(10px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ h1, h2, h3, h4 { 
+ color: #0d6efd; 
+ margin-top: 0; 
+ }
+ code, pre { 
+ background: #e9ecef; 
+ padding: 10px 15px; 
+ border-radius: 8px; 
+ font-family: 'Courier New', Courier, monospace; 
+ display: block; 
+ font-size: 20px;
+ overflow-x: auto;
+ white-space: pre-wrap;
+ }
+ .controls {
+ height: 80px; 
+ background: #ffffff; 
+ border-top: 1px solid #dee2e6;
+ display: flex; 
+ justify-content: space-between; 
+ align-items: center; 
+ padding: 0 50px;
+ }
+ button {
+ background: #0d6efd; 
+ color: white; 
+ border: none; 
+ padding: 12px 25px;
+ font-size: 18px; 
+ border-radius: 8px; 
+ cursor: pointer;
+ transition: background 0.2s;
+ }
+ button:hover {
+ background: #0b5ed7;
+ }
+ button:disabled { 
+ background: #adb5bd; 
+ cursor: not-allowed; 
+ }
+ .progress { 
+ font-size: 20px; 
+ font-weight: bold; 
+ color: #495057;
+ }
+ .slide-label { font-weight: bold; text-transform: uppercase; color: #6c757d; margin-bottom: 20px; font-size: 18px; letter-spacing: 1px; }
+ .callout { padding: 20px 30px; border-radius: 8px; margin: 20px 0; border-left: 8px solid; }
+ .callout.blue { background: #cce5ff; border-color: #004085; color: #004085; }
+ .callout.green { background: #d4edda; border-color: #155724; color: #155724; }
+ .callout.red { background: #f8d7da; border-color: #721c24; color: #721c24; }
+ .callout.yellow { background: #fff3cd; border-color: #856404; color: #856404; }
+ .section-header { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+ .section-num { font-size: 80px; font-weight: bold; color: #e9ecef; margin-bottom: -20px; }
+ .section-header h2 { font-size: 48px; color: #0d6efd; margin-bottom: 20px; }
+ img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; border: 1px solid #dee2e6; }
+ table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 20px; }
+ th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
+ th { background-color: #e9ecef; color: #0d6efd; }
+</style>
+</head>
+<body>
+ <div class="slide-container" id="slides">
+
+ <!-- Slide 1: Capa -->
+ <div class="slide active">
+ <div class="slide-label">Aula 02</div>
+ <h1>Aula 02 - Protocolo HTTP e Mensagens de Retorno</h1>
+ <p><strong>Descrição:</strong> Exploração prática da estrutura de requisições e respostas HTTP (headers, body JSON, status codes) utilizando o navegador para inspecionar o tráfego de mensagens.</p>
+ </div>
+ 
+ <!-- Slide 2: Introdução -->
+ <div class="slide">
+ <h2>Introdução</h2>
+ <p>Hoje vamos aprender de forma detalhada, simples e muito didática como funciona o Protocolo HTTP e a estrutura das mensagens que trafegam pela internet.</p>
+ <p>Antes de começarmos, é importante saber que, para entender o HTTP na prática, não podemos usar simplesmente arquivos locais salvos no computador (com o protocolo <i>file://</i>), pois o HTTP e o HTTPS são protocolos específicos para comunicação em rede.</p>
+ <p>Vamos desvendar esse assunto dividindo-o em três grandes partes: a Requisição (a pergunta do cliente), a Resposta (o retorno do servidor) e a Inspeção de Tráfego (como enxergar isso na tela).</p>
+ </div>
+
+ <!-- Slide 3: Guia Completo -->
+ <div class="slide">
+ <h2>Guia Completo: Protocolo HTTP e Mensagens de Retorno</h2>
+ <table>
+ <thead>
+ <tr>
+ <th>Componente</th>
+ <th>Função Principal</th>
+ <th>Principais Elementos</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td><strong>Requisição (Request)</strong></td>
+ <td>Mensagem enviada pelo cliente solicitando uma ação ou recurso.</td>
+ <td>Método HTTP, URL, Headers de pedido e Corpo (Body).</td>
+ </tr>
+ <tr>
+ <td><strong>Resposta (Response)</strong></td>
+ <td>Retorno do servidor com o resultado do processamento.</td>
+ <td>Linha de Estado (Status Code), Response Headers e Corpo (Body).</td>
+ </tr>
+ <tr>
+ <td><strong>Inspeção de Tráfego</strong></td>
+ <td>Análise em tempo real do fluxo de dados via ferramentas de desenvolvimento.</td>
+ <td>DevTools (Aba Network/Rede), Fiddler ou Proxies.</td>
+ </tr>
+ </tbody>
+ </table>
+ <div class="callout yellow">
+ <p><strong>Regra Importante de Execução:</strong> Para testar e inspecionar o protocolo HTTP/HTTPS na prática, é obrigatório utilizar um ambiente de rede (local ou remoto). Arquivos abertos localmente via protocolo <i>file://</i> não executam a arquitetura de comunicação do HTTP.</p>
+ </div>
+ </div>
+
+ <!-- Slide 4: Seção 01 -->
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">01</div>
+ <h2>Módulo 1: Fundamentos e Arquitetura do Protocolo HTTP</h2>
+ </div>
+ </div>
+
+ <!-- Slide 5: Módulo 1 - Conceito e Camada de Aplicação -->
+ <div class="slide">
+ <h2>Módulo 1: Fundamentos e Arquitetura do Protocolo HTTP</h2>
+ <h3>Conceito e Camada de Aplicação</h3>
+ <ul>
+ <li>O HTTP (Hypertext Transfer Protocol) opera na camada de aplicação da pilha de protocolos e atua como a espinha dorsal para a troca de dados na web.</li>
+ <li>Define as regras formais e padronizadas para navegadores e aplicações solicitarem documentos e enviarem dados de volta ao servidor.</li>
+ <li>Abstrai a complexidade das camadas de rede inferiores ao seguir especificações semânticas e sintáticas bem definidas, como a RFC 9110.</li>
+ </ul>
+ </div>
+
+ <!-- Slide 6: Módulo 1 - Modelo Cliente-Servidor -->
+ <div class="slide">
+ <h2>Módulo 1: Fundamentos e Arquitetura do Protocolo HTTP</h2>
+ <h3>Modelo Cliente-Servidor e Abstração do Navegador</h3>
+ <ul>
+ <li><strong>Fluxo Estritamente Assíncrono/Iniciado pelo Cliente:</strong> Toda comunicação começa no cliente (navegador ou app), que envia uma Requisição quando precisa de um recurso ou ação. O servidor processa o pedido e devolve uma Resposta.</li>
+ <li><strong>Gerenciamento Automatizado:</strong> APIs do navegador (como XMLHttpRequest ou a API Fetch) gerenciam os detalhes operacionais de baixo nível do protocolo em segundo plano — manipulando automaticamente cookies, redirecionamentos, proxies e políticas de cache.</li>
+ </ul>
+ </div>
+
+ <!-- Slide 7: Módulo 1 - Interoperabilidade Universal -->
+ <div class="slide">
+ <h2>Módulo 1: Fundamentos e Arquitetura do Protocolo HTTP</h2>
+ <h3>Importância da Interoperabilidade Universal</h3>
+ <ul>
+ <li>O HTTP provê um padrão universal que garante que sistemas heterogêneos (escritos em linguagens diferentes ou rodando em sistemas operacionais distintos) conversem sem falhas de interpretação.</li>
+ <li>Suporta a troca fluida de múltiplos formatos de mídia e dados: páginas HTML, arquivos CSS, scripts JS, imagens, além de dados estruturados como XML e JSON em chamadas Ajax.</li>
+ </ul>
+ </div>
+
+ <!-- Slide 8: Seção 02 -->
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">02</div>
+ <h2>Módulo 2: Anatomia da Requisição HTTP (Request)</h2>
+ </div>
+ </div>
+
+ <!-- Slide 9: Módulo 2 - Introdução -->
+ <div class="slide">
+ <h2>Módulo 2: Anatomia da Requisição HTTP (Request)</h2>
+ <p>Uma requisição HTTP enviada pelo cliente é composta estruturalmente por 4 partes essenciais:</p>
+ <ul>
+ <li>1. Método / Verbo</li>
+ <li>2. URL (Uniform Resource Locator)</li>
+ <li>3. Cabeçalhos de Pedido (Request Headers)</li>
+ <li>4. Corpo (Request Body)</li>
+ </ul>
+ </div>
+
+ <!-- Slide 10: Módulo 2 - Métodos HTTP -->
+ <div class="slide">
+ <h2>Módulo 2: Anatomia da Requisição HTTP (Request)</h2>
+ <h3>1. Métodos / Verbos HTTP</h3>
+ <p>Os verbos definem o tipo de ação solicitada ao servidor. Embora existam múltiplos métodos — como PUT, DELETE, HEAD e OPTIONS —, os dois mais utilizados no início do desenvolvimento são:</p>
+ <ul>
+ <li><strong>GET (Obter):</strong>
+ <ul>
+ <li><strong>Finalidade:</strong> Buscar ou ler dados do servidor sem gerar efeitos colaterais.</li>
+ <li><strong>Parâmetros:</strong> São anexados diretamente na URL após o caractere <i>?</i> (ex.: <i>?find=pizza&amp;zipcode=02134</i>).</li>
+ <li><strong>Característica:</strong> Respostas a requisições GET podem ser salvas em cache. Navegadores legados (como o Internet Explorer) limitavam o tamanho total da URL a 2.048 caracteres.</li>
+ </ul>
+ </li>
+ <li><strong>POST (Enviar):</strong>
+ <ul>
+ <li><strong>Finalidade:</strong> Enviar dados estruturados para processamento ou gravação (ex.: formulários ou cadastros no banco de dados).</li>
+ <li><strong>Parâmetros:</strong> São transportados ocultos dentro do corpo (body) da mensagem, permitindo volumes massivos de dados.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <!-- Slide 11: Módulo 2 - URL -->
+ <div class="slide">
+ <h2>Módulo 2: Anatomia da Requisição HTTP (Request)</h2>
+ <h3>2. URL (Uniform Resource Locator)</h3>
+ <p>Funciona como o endereço exato que identifica o recurso no servidor. Pode ser resolvida de forma relativa ao documento base e determina a rota de acesso.</p>
+ </div>
+
+ <!-- Slide 12: Módulo 2 - Cabeçalhos de Requisição -->
+ <div class="slide">
+ <h2>Módulo 2: Anatomia da Requisição HTTP (Request)</h2>
+ <h3>3. Cabeçalhos de Requisição (Request Headers)</h3>
+ <p>Pares de chave-valor que enviam metadados sobre o contexto da requisição e negociação de conteúdo:</p>
+ <ul>
+ <li><strong>Content-Type:</strong> Informa ao servidor o formato do corpo enviado (ex.: <i>text/plain</i>, <i>application/json</i> ou <i>application/x-www-form-urlencoded</i>).</li>
+ <li><strong>Accept-Encoding:</strong> Informa quais algoritmos de compressão o navegador suporta (ex.: <i>gzip</i>, que pode reduzir o tamanho dos arquivos em até 70% na transferência).</li>
+ <li><strong>User-Agent:</strong> Identifica o navegador, versão e sistema operacional do cliente.</li>
+ <li><strong>Referer:</strong> Registra a URL da página anterior que continha o link que gerou a requisição.</li>
+ <li><strong>Cabeçalhos Automáticos:</strong> O navegador preenche de forma automática e segura campos críticos como <i>Content-Length</i>, <i>Date</i> e <i>Cookie</i>.</li>
+ </ul>
+ </div>
+
+ <!-- Slide 13: Módulo 2 - Corpo da Requisição -->
+ <div class="slide">
+ <h2>Módulo 2: Anatomia da Requisição HTTP (Request)</h2>
+ <h3>4. Corpo da Requisição (Request Body)</h3>
+ <ul>
+ <li><strong>Em requisições GET:</strong> O corpo viaja vazio (ou nulo).</li>
+ <li><strong>Em requisições POST:</strong> Contém os dados da requisição. Atualmente, o padrão mais adotado para APIs é o JSON (JavaScript Object Notation), que organiza as informações em pares chave/valor:</li>
+ </ul>
+ <pre>{
+  "find": "pizza",
+  "zipcode": 02134
+}</pre>
+ </div>
+
+ <!-- Slide 14: Seção 03 -->
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">03</div>
+ <h2>Módulo 3: Anatomia da Resposta HTTP (Response)</h2>
+ </div>
+ </div>
+
+ <!-- Slide 15: Módulo 3 - Introdução e Tabela de Status Code -->
+ <div class="slide">
+ <h2>Módulo 3: Anatomia da Resposta HTTP (Response)</h2>
+ <p>A resposta enviada pelo servidor é dividida em 3 partes: Linha de Estado, Cabeçalhos de Resposta (Response Headers) e Corpo da Resposta (Response Body).</p>
+ <h3>1. Códigos de Status (Status Code)</h3>
+ <p>Códigos numéricos de três dígitos acompanhados de uma mensagem textual explicativa:</p>
+ <table>
+ <thead>
+ <tr>
+ <th>CLASSES DE CÓDIGOS HTTP</th>
+ <th>Descrição</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td><strong>1xx Informativas</strong></td>
+ <td>Requisição recebida e em processamento.</td>
+ </tr>
+ <tr>
+ <td><strong>2xx Sucesso</strong></td>
+ <td>Ação recebida, entendida e aceita.</td>
+ </tr>
+ <tr>
+ <td><strong>3xx Redirecionamento</strong></td>
+ <td>Ações adicionais necessárias (ou uso Cache).</td>
+ </tr>
+ <tr>
+ <td><strong>4xx Erro do Cliente</strong></td>
+ <td>Requisição sintaticamente incorreta ou inválida.</td>
+ </tr>
+ <tr>
+ <td><strong>5xx Erro do Servidor</strong></td>
+ <td>O servidor falhou ao processar pedido válido.</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Slide 16: Módulo 3 - Detalhamento dos Status Codes -->
+ <div class="slide">
+ <h2>Módulo 3: Anatomia da Resposta HTTP (Response)</h2>
+ <h3>1. Códigos de Status (Detalhamento)</h3>
+ <ul>
+ <li><strong>Família 1xx (Informativas):</strong> 100 Continue, 101 Switching Protocols.</li>
+ <li><strong>Família 2xx (Sucesso):</strong>
+ <ul>
+ <li><strong>200 OK:</strong> Requisição bem-sucedida; o corpo contém o resultado.</li>
+ <li><strong>204 No Content:</strong> Processado com sucesso, mas a resposta intencionalmente não possui corpo.</li>
+ </ul>
+ </li>
+ <li><strong>Família 3xx (Redirecionamento / Cache):</strong>
+ <ul>
+ <li><strong>302 Found:</strong> O recurso solicitado está temporariamente em outra URL.</li>
+ <li><strong>304 Not Modified:</strong> Indica que o recurso não mudou desde o último acesso. O navegador reaproveita a cópia guardada em cache local, economizando largura de banda.</li>
+ </ul>
+ </li>
+ <li><strong>Família 4xx (Erro do Cliente):</strong>
+ <ul>
+ <li><strong>404 Not Found:</strong> A URL solicitada não corresponde a nenhum recurso no servidor.</li>
+ </ul>
+ </li>
+ <li><strong>Família 5xx (Erro do Servidor):</strong>
+ <ul>
+ <li><strong>500 Internal Server Error:</strong> Falha genérica no código do servidor.</li>
+ <li><strong>Outros comuns:</strong> 502 Bad Gateway, 503 Service Unavailable, 504 Gateway Timeout.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <!-- Slide 17: Módulo 3 - Response Headers (Tipos MIME) -->
+ <div class="slide">
+ <h2>Módulo 3: Anatomia da Resposta HTTP (Response)</h2>
+ <h3>2. Cabeçalhos de Resposta (Response Headers) em Detalhe</h3>
+ <p>Metadados essenciais que instruem o cliente sobre como interpretar e armazenar o conteúdo:</p>
+ <ul>
+ <li><strong>Tipos MIME (Content-Type):</strong>
+ <ul>
+ <li>Orienta o parseamento do corpo. Se omitido ou configurado incorretamente pelo servidor, a análise pode falhar no cliente.</li>
+ <li>Bibliotecas como o jQuery inspecionam essa string para decidir como processar o retorno (convertendo automaticamente para XML se tiver "xml", para JSON se tiver "json" ou executando o script se contiver "javascript").</li>
+ <li>Métodos como <i>overrideMimeType()</i> permitem que o script do cliente sobrescreva a interpretação do tipo MIME caso o servidor envie o cabeçalho errado.</li>
+ <li>Esquemas como <i>blob://</i> emitem automaticamente um Content-Type baseado no tipo do objeto na memória.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <!-- Slide 18: Módulo 3 - Response Headers (Datas e Cache) -->
+ <div class="slide">
+ <h2>Módulo 3: Anatomia da Resposta HTTP (Response)</h2>
+ <h3>2. Cabeçalhos de Resposta (Continuação)</h3>
+ <ul>
+ <li><strong>Data de Modificação (Last-Modified):</strong>
+ <ul>
+ <li>Especifica o momento da última alteração do arquivo. Em documentos HTML, pode ser lido via <i>document.lastModified</i>.</li>
+ <li>Permite validação condicional: enviando a opção <i>ifModified</i>, o cliente armazena o valor e realiza a próxima requisição com o cabeçalho <i>If-Modified-Since</i>, recebendo um <i>304 Not Modified</i> caso o arquivo continue idêntico.</li>
+ </ul>
+ </li>
+ <li><strong>Diretivas de Cache (Expires):</strong>
+ <ul>
+ <li>Define uma data/hora absoluta (no formato GMT / RFC 1123) limite para a validade do arquivo no cache.</li>
+ <li>Para arquivos estáticos que nunca mudam, é padrão configurar um Expires de futuro distante (limitado a no máximo 1 ano pelas normas HTTP).</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <!-- Slide 19: Módulo 3 - Corpo da Resposta -->
+ <div class="slide">
+ <h2>Módulo 3: Anatomia da Resposta HTTP (Response)</h2>
+ <h3>3. Corpo da Resposta (Response Body) em Detalhe</h3>
+ <p>É o payload real retornado após os cabeçalhos:</p>
+ <ul>
+ <li><strong>Documentos HTML:</strong> Traz a estrutura visual renderizada pelo navegador para formar a árvore DOM.</li>
+ <li><strong>Objetos JSON:</strong> Usados em APIs para envio de dados estruturados.</li>
+ <li><strong>Erros Padronizados (RFC 9457):</strong> Retornos de erro estruturados sob a especificação <i>application/problem+json</i>, contendo os campos <i>type</i>, <i>status</i>, <i>title</i>, <i>detail</i> e <i>instance</i>.</li>
+ <li><strong>Arquivos Binários e Blobs:</strong> Retorna dados de imagens, arquivos compactados ou áudio/vídeo, que podem ser manipulados como Blob ou ArrayBuffer.</li>
+ <li><strong>Leitura Assíncrona e Stream:</strong> Em chamadas assíncronas (XHR/Fetch), o corpo pode ser lido via propriedade <i>responseText</i> ou consumido em múltiplos pedaços (chunks) via streaming à medida que chega.</li>
+ </ul>
+ </div>
+
+ <!-- Slide 20: Seção 04 -->
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">04</div>
+ <h2>Módulo 4: Prática de Inspeção e Exercícios de Fixação</h2>
+ </div>
+ </div>
+
+ <!-- Slide 21: Módulo 4 - Exercício Guiado -->
+ <div class="slide">
+ <h2>Módulo 4: Prática de Inspeção e Exercícios de Fixação</h2>
+ <h3>Exercício Guiado: Inspeção Prática de Tráfego no Navegador (Passo a Passo)</h3>
+ <p>Siga as etapas abaixo para inspecionar requisições e respostas HTTP em tempo real utilizando o navegador:</p>
+ <ol>
+ <li><strong>Abertura do Painel de Desenvolvedor:</strong> Abra o navegador Web, acesse um site qualquer (lembrando de utilizar requisições HTTP/HTTPS em vez do protocolo <i>file://</i>) e pressione F12 para abrir o DevTools.</li>
+ <li><strong>Navegação até a Aba de Rede:</strong> Clique na aba Rede (Network) e certifique-se de que a gravação de tráfego está ativa.</li>
+ <li><strong>Seleção da Requisição:</strong> Recarregue a página (F5). Selecione a primeira requisição da lista na cascata para abrir o painel de detalhes.</li>
+ <li><strong>Verificação de Cabeçalhos (Headers):</strong>
+ <ul>
+ <li>Em General, identifique o Método HTTP (ex.: GET) e o Código de Status (ex.: 200 OK).</li>
+ <li>Em Response Headers, localize o Content-Type (ex.: text/html).</li>
+ <li>Em Request Headers, localize o User-Agent.</li>
+ </ul>
+ </li>
+ <li><strong>Inspeção do Corpo e Desempenho:</strong> Clique na aba Response (ou Preview) para examinar o corpo (body) retornado e compare o tamanho do download com o tempo gasto na transferência.</li>
+ </ol>
+ </div>
+
+ <!-- Slide 22: Módulo 4 - Atividade Individual Parte A -->
+ <div class="slide">
+ <h2>Atividade Individual: Inspeção Prática e Mapeamento Semântico</h2>
+ <div class="callout yellow">
+ <p><strong>Atenção:</strong> Cada estudante deve realizar a sua própria análise e guardar os resultados para a montagem do relatório final.</p>
+ </div>
+ <h3>Parte A — Inspeção Individual de Rede:</h3>
+ <ol>
+ <li>Escolha um site de sua preferência e inspecione a requisição principal via DevTools.</li>
+ <li>Registre: a URL acessada, o Método HTTP, o Código de Status, o cabeçalho Content-Type e o User-Agent.</li>
+ <li>Compare e anote a relação entre o tamanho total da resposta e o tempo gasto no download.</li>
+ </ol>
+ </div>
+
+ <!-- Slide 23: Módulo 4 - Atividade Individual Parte B -->
+ <div class="slide">
+ <h2>Atividade Individual: Parte B — Mapeamento de Cenários</h2>
+ <p>Associe as situações da Coluna A ao código de estado correspondente na Coluna B:</p>
+ <table>
+ <thead>
+ <tr>
+ <th>Coluna A (Cenários Reais)</th>
+ <th>Coluna B (Códigos de Status)</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>1. O usuário tentou acessar uma página cuja URL foi digitada incorretamente e não existe.</td>
+ <td>( ) 304 Not Modified</td>
+ </tr>
+ <tr>
+ <td>2. O cadastro de um novo produto foi efetuado com sucesso no banco de dados.</td>
+ <td>( ) 201 Created</td>
+ </tr>
+ <tr>
+ <td>3. Um cliente tentou enviar um arquivo de vídeo de 5GB, excedendo o limite permitido pelo servidor.</td>
+ <td>( ) 404 Not Found</td>
+ </tr>
+ <tr>
+ <td>4. O servidor de banco de dados caiu inesperadamente enquanto processava a requisição.</td>
+ <td>( ) 413 Content Too Large</td>
+ </tr>
+ <tr>
+ <td>5. Uma requisição condicional identificou que o recurso não foi alterado desde o último acesso e pode ser lido do cache.</td>
+ <td>( ) 500 Internal Server Error</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Slide 24: Módulo 4 - Atividade em Dupla -->
+ <div class="slide">
+ <h2>Atividade em Dupla: Diagnóstico de Erros via JSON (RFC 9457)</h2>
+ <p>Em duplas, analisem a estrutura da mensagem de erro padronizada (<i>application/problem+json</i>) enviada por uma API e respondam às questões de diagnóstico:</p>
+ <pre>{
+  "type": "https://api.loja.com/erros/saldo-insuficiente",
+  "status": 400,
+  "title": "Falha no Pagamento",
+  "detail": "Sua conta não possui saldo suficiente para concluir o pedido de R$ 150,00.",
+  "instance": "/transacoes/tx-987654"
+}</pre>
+ <ol>
+ <li><strong>Análise do Status:</strong> Qual é a classe e o significado técnico do código de status informado no campo status?</li>
+ <li><strong>Diferenciação Semântica:</strong> Qual é a diferença prática entre as informações fornecidas no campo title e no campo detail?</li>
+ <li><strong>Rastreabilidade:</strong> Para que serve o campo instance dentro dessa estrutura de erro?</li>
+ </ol>
+ </div>
+
+ <!-- Slide 25: Módulo 4 - Instruções para Entrega -->
+ <div class="slide">
+ <h2>Instruções para Entrega Conjunta</h2>
+ <p>A entrega das atividades deve ser feita em arquivo único individual, contendo os seguintes componentes compilados:</p>
+ <ol>
+ <li><strong>Relatório da Atividade Individual:</strong> A ficha de inspeção de rede (Parte A) e o gabarito do mapeamento semântico (Parte B).</li>
+ <li><strong>Resolução da Atividade em Dupla:</strong> As respostas discursivas elaboradas em conjunto para o diagnóstico do JSON de erro (RFC 9457).</li>
+ </ol>
+ </div>
+
+ </div>
+
+ <div class="controls">
+ <button id="prevBtn" onclick="prevSlide()" disabled>Anterior</button>
+ <div class="progress"><span id="current">1</span> / <span id="total"></span></div>
+ <button id="nextBtn" onclick="nextSlide()">Próximo</button>
+ </div>
+
+ <script>
+ let currentSlideIndex = 0;
+ const slides = document.querySelectorAll('.slide');
+ const totalSlides = slides.length;
+ const currentIndicator = document.getElementById('current');
+ const totalIndicator = document.getElementById('total');
+ const prevBtn = document.getElementById('prevBtn');
+ const nextBtn = document.getElementById('nextBtn');
+
+ totalIndicator.textContent = totalSlides;
+
+ function updateView() {
+ slides.forEach((slide, index) => {
+ slide.classList.remove('active');
+ if (index === currentSlideIndex) {
+ slide.classList.add('active');
+ }
+ });
+ currentIndicator.textContent = currentSlideIndex + 1;
+ 
+ prevBtn.disabled = currentSlideIndex === 0;
+ nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+ }
+
+ function nextSlide() {
+ if (currentSlideIndex < totalSlides - 1) {
+ currentSlideIndex++;
+ updateView();
+ }
+ }
+
+ function prevSlide() {
+ if (currentSlideIndex > 0) {
+ currentSlideIndex--;
+ updateView();
+ }
+ }
+
+ document.addEventListener('keydown', (e) => {
+ if (e.key === 'ArrowRight' || e.key === 'PageDown') nextSlide();
+ if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+ });
+ </script>
+</body>
+</html>
