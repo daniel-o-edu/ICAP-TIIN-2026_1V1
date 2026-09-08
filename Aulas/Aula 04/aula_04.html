@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 04 - Envio de Dados e Ciclo CRUD no Front-End</title>
+    
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset básico e configurações padrão */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f6f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Cabeçalho e Navegação */
+        header {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.2rem;
+            color: #38bdf8;
+        }
+
+        .header-title span {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+
+        nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #38bdf8;
+        }
+
+        /* Conteúdo Principal */
+        main {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.4rem;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: #0369a1;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            color: #475569;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tabelas estilizadas */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+            background-color: #fff;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Blocos de Código e Tags */
+        code {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Caixas de Destaque / Callouts */
+        .callout {
+            background-color: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 1rem 1.25rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .callout-info {
+            background-color: #f0fdf4;
+            border-left-color: #16a34a;
+        }
+
+        /* Botão estilizado */
+        .btn {
+            display: inline-block;
+            background-color: #0284c7;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0369a1;
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        footer p {
+            color: #94a3b8;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header>
+        <div class="header-container">
+            <div class="header-title">
+                <h2>SENAI — Desenvolvimento Web</h2>
+                <span>Situação de Aprendizagem</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#construir">O que Construir</a></li>
+                    <li><a href="#etapa1">Etapa 1</a></li>
+                    <li><a href="#etapa2">Etapa 2</a></li>
+                    <li><a href="#etapa3">Etapa 3</a></li>
+                    <li><a href="#etapa4">Etapa 4</a></li>
+                    <li><a href="#etapa5">Etapa 5</a></li>
+                    <li><a href="#etapa6">Etapa 6</a></li>
+                    <li><a href="#mapa-mental">Mapa Mental</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <!-- Card de Título / Apresentação -->
+        <section class="card">
+            <h1>Aula 04 - Envio de Dados e Ciclo CRUD no Front-End</h1>
+            <p><strong>Descrição:</strong> Os estudantes desenvolvem formulários interativos na interface web para enviar e manipular dados em uma API RESTful. A prática contempla a interceptação de eventos, a serialização de dados em formato JSON e a execução de requisições POST com validação do status HTTP 201, além da implementação dos métodos PUT/PATCH e DELETE para alteração e exclusão de registros, concluindo o ciclo CRUD no Front-End com a sincronização automática do estado visual da tela.</p>
+        </section>
+
+        <!-- O que vamos construir hoje? -->
+        <section id="construir" class="card">
+            <h2>O que vamos construir hoje?</h2>
+            <p>Na aula passada, criamos um painel de logística que apenas lê as encomendas de um arquivo. Ele funciona como uma foto ou um quadro de avisos de cortiça: você consegue ver os papéis colados, mas não consegue adicionar um pacote novo, mudar a entrega para "Entregue" ou rasgar uma encomenda cancelada.</p>
+            <p>Hoje, vamos transformar essa tela estática em um sistema interativo e moderno (SPA — Single Page Application)!</p>
+            <p>Ao final desta aula, você terá um painel completo capaz de:</p>
+            <ol>
+                <li>Cadastrar novas encomendas sem a tela piscar ou dar refresh (adeus, tela branca!).</li>
+                <li>Alterar o status da entrega na hora com um simples clique direto na tabela.</li>
+                <li>Excluir encomendas canceladas com um botão dedicado.</li>
+                <li>Salvar tudo na memória do navegador (<code>localStorage</code>), para que nada se perca mesmo se você fechar e abrir o navegador de novo!</li>
+            </ol>
+        </section>
+
+        <!-- Etapa 1 -->
+        <section id="etapa1" class="card">
+            <h2>Etapa 1: Ponto de Partida e o Problema do "F5"</h2>
+            <p>Abra a pasta do projeto no VS Code e inicie o Live Server clicando em <strong>Go Live</strong> (no cantinho inferior direito da barra de status).</p>
+            
+            <h3>O "Teste do Formulário Fantasma"</h3>
+            <p>Insira um formulário simples no final do nosso <code>index.html</code>:</p>
+<pre><code>&lt;form id="form-teste"&gt;
+  &lt;input type="text" placeholder="Código de Rastreio" required&gt;
+  &lt;button type="submit"&gt;Cadastrar Encomenda&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+            <ol>
+                <li>Digite qualquer código de rastreio no campo.</li>
+                <li>Clique no botão "Cadastrar Encomenda".</li>
+                <li>Observe o que aconteceu: A página inteira piscou, deu um "F5" forçado, a URL lá em cima mudou e o que você digitou desapareceu!</li>
+            </ol>
+
+            <div class="callout callout-info">
+                <p><strong>Pense rápido:</strong> Quando você envia uma mensagem no Discord ou WhatsApp Web, a página inteira recarrega e fica branca por um segundo? Não! O aplicativo manda a mensagem em segundo plano e coloca o balãozinho na tela na mesma hora. É exatamente essa experiência de usuário (UX) profissional que vamos construir hoje.</p>
+            </div>
+        </section>
+
+        <!-- Etapa 2 -->
+        <section id="etapa2" class="card">
+            <h2>Etapa 2: Nossa "Central de Dados" no Navegador (localStorage)</h2>
+            <p>Em um sistema empresarial, os dados vão pela internet até um servidor com banco de dados. Mas por que não podemos simplesmente gravar dados direto no arquivo <code>encomendas.json</code> pelo JavaScript?</p>
+            
+            <div class="callout callout-warning">
+                <p><strong>Regra de Ouro da Web:</strong> Por segurança, o navegador não tem permissão para abrir o seu computador e alterar arquivos locais do seu disco.</p>
+            </div>
+
+            <p>Para resolver isso sem precisar instalar nenhum programa bloqueado pelo laboratório, vamos usar o <code>localStorage</code>: uma memória interna e permanente que todo navegador moderno possui para guardar informações no formato de texto JSON.</p>
+
+            <h3>Passo 2.1 — Criando a Simulação de Rede no app.js</h3>
+            <p>Na internet real, os dados levam alguns milissegundos para viajar. Para aprendermos a lidar com o tempo de espera e dar avisos na tela para o usuário, vamos criar uma pequena função de "atraso" (delay).</p>
+            <p>Abra o seu <code>app.js</code> e adicione logo no topo (linha 1):</p>
+<pre><code>// Simula o tempo que a internet levaria para responder (em milissegundos)
+const simularRede = (ms = 300) =&gt; new Promise(resolve =&gt; setTimeout(resolve, ms));</code></pre>
+
+            <h3>Passo 2.2 — Atualizando a Consulta de Encomendas</h3>
+            <p>Vamos ensinar a nossa função <code>consultarEncomendas</code> a fazer o seguinte:</p>
+            <ol>
+                <li>Se for a primeira vez que você abre a página, ela busca as encomendas do <code>encomendas.json</code> (como já fazia) e guarda uma cópia no <code>localStorage</code>.</li>
+                <li>Nas vezes seguintes, ela passa a ler direto da memória do <code>localStorage</code>.</li>
+            </ol>
+            <p>No <code>app.js</code>, substitua a função <code>consultarEncomendas</code> por esta versão atualizada:</p>
+<pre><code>async function consultarEncomendas() {
+  elCarregando.style.display = "block";
+  elErro.style.display = "none";
+  try {
+    // Simula uma resposta rápida de rede
+    await simularRede(300);
+    // 1. Tenta pegar os dados salvos na memória do navegador
+    let dadosSalvos = localStorage.getItem("banco_encomendas");
+    // 2. Se a memória estiver vazia, busca do encomendas.json pela primeira vez
+    if (!dadosSalvos) {
+      const resposta = await fetch("encomendas.json");
+      if (!resposta.ok) throw new Error("Erro ao ler o arquivo JSON");
+      const dadosIniciais = await resposta.json();
+      // Guarda no navegador em formato de texto JSON
+      localStorage.setItem("banco_encomendas", JSON.stringify(dadosIniciais));
+      dadosSalvos = JSON.stringify(dadosIniciais);
+    }
+    // 3. Converte o texto JSON de volta para uma lista de objetos no JavaScript
+    const encomendas = JSON.parse(dadosSalvos);
+    renderizarTabela(encomendas);
+  } catch (erro) {
+    elErro.textContent = "Não foi possível carregar as encomendas.";
+    elErro.style.display = "block";
+    console.error(erro);
+  } finally {
+    elCarregando.style.display = "none";
+  }
+}</code></pre>
+
+            <div class="callout callout-info">
+                <p><strong>Conceito Chave:</strong></p>
+                <ul>
+                    <li><code>JSON.stringify(objeto)</code>: Transforma dados do JavaScript em texto puro para poder salvar.</li>
+                    <li><code>JSON.parse(texto)</code>: Transforma o texto de volta em dados que o JavaScript entende.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Etapa 3 -->
+        <section id="etapa3" class="card">
+            <h2>Etapa 3: Formulários Sem F5 e Cadastro (Create)</h2>
+            
+            <h3>Passo 3.1 — Ajustando o index.html</h3>
+            <p>Vamos preparar nossa interface:</p>
+            <ol>
+                <li>Adicionar a coluna "Ações" no cabeçalho da tabela.</li>
+                <li>Trocar o formulário de teste por um formulário completo com código, nome e seleção de status.</li>
+            </ol>
+            <p>Abra o <code>index.html</code> e substitua todo o seu conteúdo por:</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-br"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Painel de Encomendas&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Painel de Controle de Entregas&lt;/h1&gt;
+  &lt;p id="carregando"&gt;Carregando encomendas...&lt;/p&gt;
+  &lt;p id="erro" style="color: red; display: none;"&gt;&lt;/p&gt;
+
+  &lt;!-- Formulário Completo de Cadastro --&gt;
+  &lt;form id="form-encomenda" style="margin-bottom: 25px;"&gt;
+    &lt;h3&gt;Cadastrar Nova Encomenda&lt;/h3&gt;
+    &lt;input type="text" id="input-codigo" placeholder="Código (ex: BR004)" required&gt;
+    &lt;input type="text" id="input-cliente" placeholder="Nome do Cliente" required&gt;
+    &lt;select id="select-status"&gt;
+      &lt;option value="PENDENTE"&gt;PENDENTE&lt;/option&gt;
+      &lt;option value="EM_TRANSITO"&gt;EM TRÂNSITO&lt;/option&gt;
+      &lt;option value="ENTREGUE"&gt;ENTREGUE&lt;/option&gt;
+    &lt;/select&gt;
+    &lt;button type="submit"&gt;Cadastrar Encomenda&lt;/button&gt;
+  &lt;/form&gt;
+
+  &lt;table id="tabela-encomendas" border="1" cellpadding="6" style="border-collapse: collapse;"&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Código&lt;/th&gt;
+        &lt;th&gt;Cliente&lt;/th&gt;
+        &lt;th&gt;Status&lt;/th&gt;
+        &lt;th&gt;Ações&lt;/th&gt; &lt;!-- Nova coluna para os botões! --&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody id="corpo-tabela"&gt;&lt;/tbody&gt;
+  &lt;/table&gt;
+
+  &lt;script src="app.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+            <h3>Passo 3.2 — Puxando o "Freio de Mão" (event.preventDefault())</h3>
+            <p>Para impedir que o navegador recarregue a página quando o formulário for enviado, usamos o comando <code>event.preventDefault()</code>.</p>
+            <p>No final do <code>app.js</code>, adicione o ouvinte de envio:</p>
+<pre><code>// Seleciona o formulário oficial
+const formEncomenda = document.getElementById("form-encomenda");
+
+// Escuta o momento exato em que o usuário clica no botão ou aperta Enter
+formEncomenda.addEventListener("submit", async function(event) {
+  // PUXA O FREIO DE MÃO: Impede a tela de piscar/recarregar!
+  event.preventDefault();
+
+  // Captura os valores digitados
+  const novaEncomenda = {
+    codigoRastreio: document.getElementById("input-codigo").value.trim(),
+    clienteNome: document.getElementById("input-cliente").value.trim(),
+    status: document.getElementById("select-status").value
+  };
+
+  // Envia para a função de salvamento
+  await cadastrarEncomenda(novaEncomenda);
+});</code></pre>
+
+            <h3>Passo 3.3 — Criando a Função cadastrarEncomenda</h3>
+            <p>Quando o usuário clica em cadastrar, queremos uma boa experiência de uso (UX): desabilitar o botão temporariamente para evitar cliques duplos e avisar que o sistema está processando.</p>
+            <p>Adicione a função no seu <code>app.js</code>:</p>
+<pre><code>async function cadastrarEncomenda(novaEncomenda) {
+  const btnSubmit = document.querySelector("#form-encomenda button[type='submit']");
+  try {
+    // Feedback visual imediato: trava o botão enquanto salva
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Cadastrando...";
+
+    // Simula a espera do processamento (500ms)
+    await simularRede(500);
+
+    // 1. Pega as encomendas que já estão guardadas
+    const encomendas = JSON.parse(localStorage.getItem("banco_encomendas")) || [];
+
+    // 2. Adiciona o novo item na lista
+    encomendas.push(novaEncomenda);
+
+    // 3. Salva a lista atualizada de volta na memória
+    localStorage.setItem("banco_encomendas", JSON.stringify(encomendas));
+
+    // 4. A REGRA DE OURO (Fonte da Verdade): Chama a consulta para redesenhar a tela
+    await consultarEncomendas();
+
+    // 5. Limpa os campos do formulário
+    document.getElementById("form-encomenda").reset();
+  } catch (erro) {
+    console.error("Erro ao salvar:", erro);
+    alert("Ops! Ocorreu um erro ao salvar a encomenda.");
+  } finally {
+    // Restaura o botão ao normal, dando certo ou errado
+    btnSubmit.disabled = false;
+    btnSubmit.textContent = "Cadastrar Encomenda";
+  }
+}</code></pre>
+
+            <p>Faça o teste agora: Cadastre uma encomenda no formulário. Repare que o botão muda de texto rapidamente e a nova linha entra na tabela sem que a página recarregue!</p>
+        </section>
+
+        <!-- Etapa 4 -->
+        <section id="etapa4" class="card">
+            <h2>Etapa 4: Atualizando (Update) e Excluindo (Delete)</h2>
+            <p>Agora que sabemos criar novos itens, precisamos conseguir modificar o status e remover pacotes cancelados.</p>
+
+            <h3>Passo 4.1 — Criando as Funções de Alteração e Exclusão</h3>
+            <p>Adicione estas duas funções no <code>app.js</code>:</p>
+<pre><code>// EXCLUIR ENCOMENDA
+async function excluirEncomenda(codigo) {
+  try {
+    await simularRede(200);
+
+    // 1. Pega a lista atual
+    let encomendas = JSON.parse(localStorage.getItem("banco_encomendas")) || [];
+
+    // 2. Filtra a lista, mantendo apenas quem NÃO TEM esse código
+    encomendas = encomendas.filter(item =&gt; item.codigoRastreio !== codigo);
+
+    // 3. Salva a nova lista sem o item deletado
+    localStorage.setItem("banco_encomendas", JSON.stringify(encomendas));
+
+    // 4. Redesenha a tabela
+    await consultarEncomendas();
+  } catch (erro) {
+    console.error("Erro ao excluir:", erro);
+    alert("Não foi possível excluir a encomenda.");
+  }
+}
+
+// ATUALIZAR STATUS DA ENCOMENDA
+async function atualizarStatus(codigo, novoStatus) {
+  try {
+    await simularRede(200);
+    const encomendas = JSON.parse(localStorage.getItem("banco_encomendas")) || [];
+
+    // Localiza o item pelo código de rastreio
+    const itemEncontrado = encomendas.find(item =&gt; item.codigoRastreio === codigo);
+
+    if (itemEncontrado) {
+      itemEncontrado.status = novoStatus; // Altera o status
+      localStorage.setItem("banco_encomendas", JSON.stringify(encomendas));
+      await consultarEncomendas();
+    }
+  } catch (erro) {
+    console.error("Erro ao atualizar status:", erro);
+    alert("Falha ao atualizar o status.");
+  }
+}</code></pre>
+
+            <h3>Passo 4.2 — Atualizando a renderizarTabela com Controles Interativos</h3>
+            <p>Agora vamos redesenhar a tabela para que cada linha ganhe seu próprio seletor de status (<code>&lt;select&gt;</code>) e um botão de exclusão (🗑️ Excluir).</p>
+            <p>No seu <code>app.js</code>, substitua a função <code>renderizarTabela</code> existente por esta:</p>
+<pre><code>function renderizarTabela(encomendas) {
+  corpoTabela.innerHTML = ""; // Limpa a tabela antes de redesenhar
+  const fragmento = document.createDocumentFragment();
+
+  encomendas.forEach(encomenda =&gt; {
+    const linha = document.createElement("tr");
+
+    // 1. Coluna Código
+    const tdCodigo = document.createElement("td");
+    tdCodigo.textContent = encomenda.codigoRastreio;
+
+    // 2. Coluna Cliente
+    const tdCliente = document.createElement("td");
+    tdCliente.textContent = encomenda.clienteNome;
+
+    // 3. Coluna Status com Seletor Interativo
+    const tdStatus = document.createElement("td");
+    const selectStatus = document.createElement("select");
+    const opcoes = ["PENDENTE", "EM_TRANSITO", "ENTREGUE"];
+
+    opcoes.forEach(opcao =&gt; {
+      const opt = document.createElement("option");
+      opt.value = opcao;
+      opt.textContent = opcao.replace("_", " ");
+      if (opcao === encomenda.status) opt.selected = true;
+      selectStatus.appendChild(opt);
+    });
+
+    // Quando o usuário escolhe outra opção, atualiza automaticamente!
+    selectStatus.addEventListener("change", (e) =&gt; {
+      atualizarStatus(encomenda.codigoRastreio, e.target.value);
+    });
+
+    tdStatus.appendChild(selectStatus);
+
+    // 4. Coluna Ações com Botão de Excluir
+    const tdAcoes = document.createElement("td");
+    const btnExcluir = document.createElement("button");
+    btnExcluir.textContent = "🗑️ Excluir";
+
+    btnExcluir.addEventListener("click", () =&gt; {
+      excluirEncomenda(encomenda.codigoRastreio);
+    });
+
+    tdAcoes.appendChild(btnExcluir);
+
+    // Monta as 4 colunas na linha
+    linha.appendChild(tdCodigo);
+    linha.appendChild(tdCliente);
+    linha.appendChild(tdStatus);
+    linha.appendChild(tdAcoes);
+
+    fragmento.appendChild(linha);
+  });
+
+  corpoTabela.appendChild(fragmento);
+}</code></pre>
+        </section>
+
+        <!-- Etapa 5 -->
+        <section id="etapa5" class="card">
+            <h2>Etapa 5: O Laboratório Dev no Navegador</h2>
+            <p>Vamos inspecionar a memória do navegador para ver onde os dados realmente estão morando!</p>
+            <ol>
+                <li>Na página aberta pelo Live Server, aperte a tecla <strong>F12</strong> (ou clique com o botão direito e vá em Inspecionar).</li>
+                <li>No menu superior da janela do desenvolvedor, clique na aba <strong>Application</strong> (ou Aplicativo).</li>
+                <li>No menu lateral esquerdo, clique na setinha ao lado de <strong>Local Storage</strong> e escolha o endereço do seu Live Server (<code>http://127.0.0.1:5500</code>).</li>
+                <li>Veja a chave <code>banco_encomendas</code>:</li>
+            </ol>
+            <ul>
+                <li>Cadastre um novo pacote e veja o texto aumentar em tempo real!</li>
+                <li>Mude o status ou clique em excluir e veja a linha no DevTools se atualizar sozinha.</li>
+                <li><strong>O teste supremo:</strong> Dê um F5 na página ou feche o navegador e abra de novo. Seus dados continuam todos lá intactos!</li>
+            </ul>
+        </section>
+
+        <!-- Etapa 6 -->
+        <section id="etapa6" class="card">
+            <h2>Etapa 6: Missão Prática em Duplas</h2>
+            <p>Trabalhem em duplas e confiram o checklist de desenvolvimento do painel:</p>
+            <ul>
+                <li><strong>[ ] Sem F5:</strong> O formulário cadastra novos itens sem piscar a página.</li>
+                <li><strong>[ ] Feedback:</strong> O botão exibe "Cadastrando..." e fica desabilitado durante a gravação.</li>
+                <li><strong>[ ] Update Direto:</strong> Ao mudar o status no seletor da tabela, a alteração se mantém após recarregar a página.</li>
+                <li><strong>[ ] Delete:</strong> Clicar em "Excluir" remove a linha da tabela e apaga do <code>localStorage</code>.</li>
+                <li><strong>[ ] Persistência:</strong> Fechar a aba do navegador e abrir novamente mantém todos os dados cadastrados.</li>
+            </ul>
+        </section>
+
+        <!-- Mapa Mental & Spoiler -->
+        <section id="mapa-mental" class="card">
+            <h2>Mapa Mental da Aula (Card de Consulta Rápida)</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Recurso</th>
+                            <th>Para que serve no projeto?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>event.preventDefault()</code></td>
+                            <td>Puxa o "freio de mão" do formulário para impedir que a tela recarregue (F5).</td>
+                        </tr>
+                        <tr>
+                            <td><code>localStorage.setItem()</code></td>
+                            <td>Salva dados de forma permanente na memória do navegador.</td>
+                        </tr>
+                        <tr>
+                            <td><code>localStorage.getItem()</code></td>
+                            <td>Recupera os dados salvos anteriormente no navegador.</td>
+                        </tr>
+                        <tr>
+                            <td><code>JSON.stringify()</code></td>
+                            <td>Converte objetos e listas JavaScript em texto para salvar no armazenamento.</td>
+                        </tr>
+                        <tr>
+                            <td><code>JSON.parse()</code></td>
+                            <td>Converte o texto salvo de volta para objetos/listas que o JavaScript manipula.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fonte Única da Verdade</strong></td>
+                            <td>Sempre que alteramos dados, chamamos <code>consultarEncomendas()</code> para manter a tela sincronizada com o banco.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Spoiler das Próximas Aulas</h3>
+            <p>Hoje aprendemos a dominar a tela e os dados do lado do usuário (Front-End)! Nas próximas aulas, vamos aprender como construir o outro lado da ponte: o Back-End com Node.js, criando APIs que recebem esses mesmos dados e gravam em um banco de dados real no servidor!</p>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; SENAI — Serviço Nacional de Aprendizagem Industrial. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        console.log("Página da Aula 04 carregada com sucesso!");
+    </script>
+
+</body>
+</html>
