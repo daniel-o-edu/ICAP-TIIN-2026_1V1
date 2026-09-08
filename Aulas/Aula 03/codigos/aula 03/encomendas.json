@@ -1,0 +1,5 @@
+[
+  { "codigoRastreio": "BR001", "clienteNome": "Ana Souza", "status": "EM_TRANSITO" },
+  { "codigoRastreio": "BR002", "clienteNome": "Carlos Lima", "status": "ENTREGUE" },
+  { "codigoRastreio": "BR003", "clienteNome": "Fernanda Dias", "status": "PENDENTE" }
+]

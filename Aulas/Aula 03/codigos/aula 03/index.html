@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel de Encomendas</title>
+</head>
+<body>
+  <h1>Painel de Controle de Entregas</h1>
+ 
+  <p id="carregando">Carregando encomendas...</p>
+  <p id="erro" style="color: red; display: none;"></p>
+ 
+  <table id="tabela-encomendas" border="1">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Cliente</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="corpo-tabela"></tbody>
+  </table>
+
+  <form id="form-teste">
+    <input type="text" placeholder="Código de Rastreio" required>
+    <button type="submit">Cadastrar Encomenda</button>
+    </form> 
+ 
+  <script src="app.js"></script>
+</body>
+</html>
