@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Aula 05 - Fundamentos JS e Funções</title>
+ 
+ <style>
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ }
+
+ body {
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ line-height: 1.6;
+ background-color: #f4f6f8;
+ color: #333;
+ display: flex;
+ flex-direction: column;
+ min-height: 100vh;
+ }
+
+ header {
+ background-color: #1e293b;
+ color: #ffffff;
+ padding: 1.2rem 2rem;
+ position: sticky;
+ top: 0;
+ z-index: 1000;
+ box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+ }
+
+ .header-container {
+ max-width: 1100px;
+ margin: 0 auto;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ flex-wrap: wrap;
+ gap: 1rem;
+ }
+
+ .header-title h2 {
+ font-size: 1.25rem;
+ margin-bottom: 0.2rem;
+ color: #38bdf8;
+ }
+
+ .header-title span {
+ font-size: 0.85rem;
+ color: #94a3b8;
+ }
+
+ nav ul {
+ list-style: none;
+ display: flex;
+ flex-wrap: wrap;
+ gap: 1.2rem;
+ }
+
+ nav a {
+ color: #e2e8f0;
+ text-decoration: none;
+ font-weight: 500;
+ font-size: 0.9rem;
+ transition: color 0.3s ease;
+ }
+
+ nav a:hover {
+ color: #38bdf8;
+ }
+
+ main {
+ max-width: 1100px;
+ margin: 2rem auto;
+ padding: 0 1.5rem;
+ flex: 1;
+ width: 100%;
+ }
+
+ .card {
+ background: #ffffff;
+ border-radius: 8px;
+ padding: 2rem;
+ box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+ margin-bottom: 2rem;
+ }
+
+ h1 {
+ font-size: 1.8rem;
+ color: #0f172a;
+ margin-bottom: 0.75rem;
+ }
+
+ h2 {
+ font-size: 1.4rem;
+ color: #1e293b;
+ margin-bottom: 1rem;
+ border-bottom: 2px solid #e2e8f0;
+ padding-bottom: 0.4rem;
+ }
+
+ h3 {
+ font-size: 1.15rem;
+ color: #0369a1;
+ margin-top: 1.5rem;
+ margin-bottom: 0.75rem;
+ }
+
+ p {
+ margin-bottom: 1rem;
+ color: #475569;
+ }
+
+ ul, ol {
+ margin-bottom: 1rem;
+ padding-left: 1.5rem;
+ color: #475569;
+ }
+
+ li {
+ margin-bottom: 0.5rem;
+ }
+
+ .table-responsive {
+ overflow-x: auto;
+ margin-bottom: 1.5rem;
+ }
+
+ table {
+ width: 100%;
+ border-collapse: collapse;
+ margin-top: 0.5rem;
+ background-color: #fff;
+ font-size: 0.95rem;
+ }
+
+ th, td {
+ padding: 0.75rem 1rem;
+ text-align: left;
+ border: 1px solid #e2e8f0;
+ }
+
+ th {
+ background-color: #1e293b;
+ color: #ffffff;
+ font-weight: 600;
+ }
+
+ tr:nth-child(even) {
+ background-color: #f8fafc;
+ }
+
+ code {
+ background-color: #f1f5f9;
+ color: #0f172a;
+ padding: 0.2rem 0.4rem;
+ border-radius: 4px;
+ font-family: 'Consolas', 'Courier New', monospace;
+ font-size: 0.9em;
+ }
+
+ pre {
+ background-color: #0f172a;
+ color: #f8fafc;
+ padding: 1.2rem;
+ border-radius: 8px;
+ overflow-x: auto;
+ font-family: 'Consolas', 'Courier New', monospace;
+ font-size: 0.9rem;
+ line-height: 1.5;
+ margin-bottom: 1.2rem;
+ }
+
+ pre code {
+ background-color: transparent;
+ color: inherit;
+ padding: 0;
+ }
+
+ .callout {
+ background-color: #f0f9ff;
+ border-left: 4px solid #0284c7;
+ padding: 1rem 1.25rem;
+ border-radius: 4px;
+ margin-bottom: 1.5rem;
+ }
+
+ .callout p:last-child {
+ margin-bottom: 0;
+ }
+
+ .callout-warning {
+ background-color: #fffbeb;
+ border-left-color: #f59e0b;
+ }
+
+ .callout-info {
+ background-color: #f0fdf4;
+ border-left-color: #16a34a;
+ }
+
+ .btn {
+ display: inline-block;
+ background-color: #0284c7;
+ color: white;
+ padding: 0.75rem 1.5rem;
+ border-radius: 6px;
+ text-decoration: none;
+ font-weight: 600;
+ transition: background-color 0.3s ease;
+ }
+
+ .btn:hover {
+ background-color: #0369a1;
+ }
+
+ footer {
+ background-color: #1e293b;
+ color: #94a3b8;
+ text-align: center;
+ padding: 1.5rem;
+ margin-top: auto;
+ }
+
+ footer p {
+ color: #94a3b8;
+ margin-bottom: 0;
+ }
+ </style>
+</head>
+<body>
+ <header>
+ <div class="header-container">
+ <div class="header-title">
+ <h2>SENAI — Curso Técnico de Informática para Internet</h2>
+ <span>Prof. Daniel Oliveira</span>
+ </div>
+ <nav>
+ <ul>
+ <li><a href="#introducao-variaveis">Variáveis</a></li>
+ <li><a href="#tipos-dados">Tipos de Dados</a></li>
+ <li><a href="#atividade1">Atividade I</a></li>
+ <li><a href="#operadores">Operadores</a></li>
+ <li><a href="#controle-fluxo">Controle de Fluxo</a></li>
+ <li><a href="#lacos-repeticao">Laços</a></li>
+ <li><a href="#funcoes">Funções</a></li>
+ <li><a href="#atividade2">Atividade II</a></li>
+ <li><a href="#escopo">Escopo</a></li>
+ <li><a href="#utils">utils.js</a></li>
+ <li><a href="#callbacks-timers">Callbacks</a></li>
+ <li><a href="#boas-praticas-modulos">Módulos</a></li>
+ <li><a href="#atividade3-checklist">Atividade III</a></li>
+ </ul>
+ </nav>
+ </div>
+ </header>
+
+ <main>
+ <section class="card">
+ <h1>Aula 05: Fundamentos JS E Funções</h1>
+ <p><strong>Descrição:</strong> Nesta aula, lançaremos as bases da lógica de programação em JavaScript. Vamos entender como armazenar dados, manipulá-los e, crucialmente, como encapsular lógica reutilizável através de funções para criar a nossa primeira biblioteca utilitária: <code>utils.js</code>.</p>
+ </section>
+
+ <section id="introducao-variaveis" class="card">
+ <h2>01 a 06: Fundamentos e Variáveis</h2>
+ 
+ <h3>01: FUNDAMENTOS JS E FUNÇÕES</h3>
+ <p><strong>O Motor da Web Moderna</strong></p>
+ <p>Nesta aula, lançaremos as bases da lógica de programação em JavaScript. Vamos entender como armazenar dados, manipulá-los e, crucialmente, como encapsular lógica reutilizável através de funções para criar a nossa primeira biblioteca utilitária: <code>utils.js</code>.</p>
+
+ <h3>02: O QUE É JAVASCRIPT HOJE?</h3>
+ <p>É uma linguagem de programação de alto nível, interpretada (ou compilada JIT), prototipada e multiparadigma. É a linguagem nativa dos navegadores e, com Node.js, domina também o back-end.</p>
+
+ <h3>03: VARIÁVEIS: ONDE TUDO COMEÇA</h3>
+ <p>Variáveis são 'caixas' ou contêineres rotulados para armazenar dados na memória do computador. No JS moderno, temos formas específicas de declarar essas caixas dependendo de como vamos usar o dado.</p>
+
+ <h3>04: A EVOLUÇÃO: VAR VS LET VS CONST</h3>
+ <ul>
+ <li><code>var</code>: A forma antiga. Possui escopo de função e comportamento imprevisível (hoisting). Evite no JS moderno.</li>
+ <li><code>let</code>: Introduzido no ES6. Possui escopo de bloco e pode ter seu valor reatribuído.</li>
+ <li><code>const</code>: Também do ES6. Possui escopo de bloco, mas seu valor não pode ser reatribuído após a inicialização.</li>
+ </ul>
+
+ <h3>05: USO PRÁTICO: ESCOPO DE BLOCO</h3>
+ <p>O escopo de bloco (let/const) impede que variáveis 'vazem' de dentro de estruturas como <code>if</code> ou <code>for</code>.</p>
+<pre><code>if (true) {
+ let local = 'visível apenas aqui';
+ var global = 'vaza para fora';
+}
+// console.log(local); // Erro
+console.log(global); // Funciona</code></pre>
+
+ <h3>06: A REGRA DE OURO: CONST POR PADRÃO</h3>
+ <p>Sempre use <code>const</code> para declarar variáveis. Se você descobrir depois que precisa mudar o valor dela (como em um contador), altere para <code>let</code>. Isso previne bugs acidentais de reatribuição.</p>
+ </section>
+
+ <section id="tipos-dados" class="card">
+ <h2>07 a 10: Tipos de Dados</h2>
+
+ <h3>07: TIPOS DE DADOS DINÂMICOS</h3>
+ <p>O JavaScript é fracamente tipado e dinâmico. Você não precisa declarar o tipo, e uma variável pode mudar de tipo durante a execução.</p>
+<pre><code>let dado = 'Olá'; // tipo String
+dado = 42; // agora é Number</code></pre>
+
+ <h3>08: TIPOS PRIMITIVOS I: STRING E NUMBER</h3>
+ <ul>
+ <li><strong>String:</strong> Sequência de caracteres. Usamos aspas simples (<code>' '</code>), duplas (<code>" "</code>) ou crases (<code>` `</code>) para Template Strings.</li>
+ <li><strong>Number:</strong> Inclui inteiros e números de ponto flutuante (decimais). O JS não faz distinção.</li>
+ </ul>
+
+ <h3>09: TEMPLATE STRINGS (CRASES)</h3>
+ <p>A forma moderna e poderosa de trabalhar com texto, permitindo quebra de linha e interpolação de variáveis.</p>
+<pre><code>const nome = 'Maria';
+const msg = `Olá, ${nome}.
+Bem-vinda!`;</code></pre>
+
+ <h3>10: TIPOS PRIMITIVOS II: BOOLEAN E NULL/UNDEFINED</h3>
+ <ul>
+ <li><strong>Boolean:</strong> Apenas dois valores: <code>true</code> (verdadeiro) ou <code>false</code> (falso). Base para lógica de decisão.</li>
+ <li><strong>Undefined:</strong> Valor padrão de uma variável declarada mas não inicializada.</li>
+ <li><strong>Null:</strong> Representa a ausência intencional de qualquer valor de objeto.</li>
+ </ul>
+ </section>
+
+ <section id="atividade1" class="card">
+ <h2>11: ATIVIDADE I: PESQUISA E CURIOSIDADE</h2>
+ <div class="callout callout-info">
+ <p><strong>=== Trabalho em Grupo (3 Pessoas) ===</strong></p>
+ <p>Pesquisem na documentação MDN (Mozilla Developer Network) e respondam:</p>
+ <ul>
+ <li>O que acontece se você usar o operador <code>typeof</code> em um valor <code>null</code>? Por que isso acontece?</li>
+ <li>Quais são os 7 tipos primitivos do JavaScript no ES6+?</li>
+ <li>Qual a diferença prática entre <code>==</code> (igualdade ampla) e <code>===</code> (igualdade estrita)?</li>
+ </ul>
+ </div>
+ </section>
+
+ <section id="operadores" class="card">
+ <h2>12 a 16: Operadores</h2>
+
+ <h3>12: OPERADORES ARITMÉTICOS</h3>
+ <p>Símbolos para realizar cálculos matemáticos padrão.</p>
+ <p><code>+</code> (adição/concatenação), <code>-</code> (subtração), <code>*</code> (multiplicação), <code>/</code> (divisão), <code>%</code> (módulo/resto), <code>**</code> (exponenciação).</p>
+ <div class="callout callout-info">
+ <p><strong>📌 Uso Prático:</strong> O operador <code>%</code> (módulo) é essencial para descobrir se um número é par (<code>n % 2 === 0</code>).</p>
+ </div>
+
+ <h3>13: OPERADORES DE ATRIBUIÇÃO</h3>
+ <p>Formas curtas de atualizar o valor de uma variável baseada em seu valor anterior.</p>
+<pre><code>let x = 10;
+x += 5; // x = x + 5 (resultado: 15)
+x *= 2; // x = x * 2 (resultado: 30)</code></pre>
+
+ <h3>14: OPERADORES DE COMPARAÇÃO</h3>
+ <p>Usados em estruturas condicionais para retornar um Booleano.</p>
+ <p><code>===</code> (igual estrito), <code>!==</code> (diferente estrito), <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>.</p>
+ <div class="callout callout-warning">
+ <p><strong>📌 Aviso:</strong> Sempre prefira <code>===</code> e <code>!==</code> para evitar coerção de tipo indesejada (ex: <code>'5' == 5</code> é <code>true</code>, mas <code>'5' === 5</code> é <code>false</code>).</p>
+ </div>
+
+ <h3>15: OPERADORES LÓGICOS</h3>
+ <p>Permitem combinar múltiplas comparações.</p>
+ <ul>
+ <li><code>&amp;&amp;</code> (E): Retorna <code>true</code> se AMBOS forem verdadeiros.</li>
+ <li><code>||</code> (OU): Retorna <code>true</code> se PELO MENOS UM for verdadeiro.</li>
+ <li><code>!</code> (NÃO): Inverte o valor booleano.</li>
+ </ul>
+
+ <h3>16: USO PRÁTICO: LÓGICA COMBINADA</h3>
+<pre><code>const idade = 20;
+const temCnh = true;
+const podeDirigir = idade &gt;= 18 &amp;&amp; temCnh;
+// resultado: true</code></pre>
+ </section>
+
+ <section id="controle-fluxo" class="card">
+ <h2>17 a 19: Controle de Fluxo</h2>
+
+ <h3>17: CONTROLE DE FLUXO: IF E ELSE</h3>
+ <p>A estrutura <code>if...else</code> permite que o código tome decisões com base em condições lógicas avaliadas como Booleanas.</p>
+<pre><code>const hora = 14;
+if (hora &lt; 12) {
+ console.log('Bom dia!');
+} else {
+ console.log('Boa tarde ou noite!');
+}</code></pre>
+ <div class="callout callout-info">
+ <p><strong>📌 Uso Prático:</strong> É o mecanismo básico de bifurcação de caminhos no seu software.</p>
+ </div>
+
+ <h3>18: CONDIÇÕES MÚLTIPLAS: ELSE IF</h3>
+ <p>Quando temos mais de duas possibilidades, podemos encadear os testes para cobrir cenários progressivos.</p>
+<pre><code>const nota = 85;
+if (nota &gt;= 90) {
+ console.log('Conceito A');
+} else if (nota &gt;= 80) {
+ console.log('Conceito B');
+} else {
+ console.log('Precisa melhorar');
+}</code></pre>
+ <div class="callout callout-info">
+ <p><strong>📌 Dica:</strong> A ordem importa! O JavaScript avalia de cima para baixo e executa apenas o primeiro bloco verdadeiro.</p>
+ </div>
+
+ <h3>19: OPERADOR TERNÁRIO</h3>
+ <p>Uma forma concisa (short-hand) de escrever um <code>if...else</code> em uma única linha. É indispensável no desenvolvimento moderno.</p>
+<pre><code>// Sintaxe: condicao ? retorno_se_verdadeiro : retorno_se_falso
+const idade = 20;
+const status = idade &gt;= 18 ? 'Maior de idade' : 'Menor de idade';
+console.log(status); // Imprime: 'Maior de idade'</code></pre>
+ </section>
+
+ <section id="lacos-repeticao" class="card">
+ <h2>20 a 23: Laços de Repetição (Loops)</h2>
+
+ <h3>20: LAÇOS DE REPETIÇÃO (LOOPS)</h3>
+ <p>Loops servem para executar o mesmo bloco de código repetidas vezes até que uma condição de parada seja alcançada. Isso evita a repetição manual do código e automatiza fluxos (conceito DRY - Don't Repeat Yourself).</p>
+ <ul>
+ <li><strong>for:</strong> Excelente para quando você sabe a quantidade exata de vezes que precisa repetir.</li>
+ <li><strong>while:</strong> Excelente para quando o número de repetições é incerto, dependendo apenas de uma condição.</li>
+ </ul>
+
+ <h3>21: O CLÁSSICO: LAÇO FOR</h3>
+ <p>O laço <code>for</code> tradicional possui 3 parâmetros definidos: a inicialização, a condição de parada, e a taxa de incremento.</p>
+<pre><code>// for (inicializacao; condicao; incremento)
+for (let i = 0; i &lt; 5; i++) {
+ console.log(`Contador: ${i}`);
+}</code></pre>
+ <div class="callout callout-warning">
+ <p><strong>📌 Aviso:</strong> Note o uso do <code>let</code> para inicializar o controle <code>i</code>, pois seu valor precisa ser constantemente reatribuído (<code>i++</code>) a cada nova volta no loop.</p>
+ </div>
+
+ <h3>22: O FLEXÍVEL: LAÇO WHILE</h3>
+ <p>O <code>while</code> avalia uma condição, executando o bloco sempre que ela for <code>true</code>. Devemos garantir que o controle de estado avance para o final para não travarmos o código.</p>
+<pre><code>let energia = 100;
+while (energia &gt; 0) {
+ console.log('Jogando...');
+ energia -= 20; // Consome a energia até virar 0
+}
+console.log('Fim de jogo!');</code></pre>
+
+ <h3>23: A FORMA MODERNA: FOR...OF</h3>
+ <p>Introduzido no ES6, é a maneira mais elegante e segura de iterar sobre estruturas de dados como arrays e strings (valores iteráveis).</p>
+<pre><code>const frutas = ['Maçã', 'Banana', 'Uva'];
+for (const fruta of frutas) {
+ console.log(fruta);
+}</code></pre>
+ <div class="callout callout-info">
+ <p><strong>📌 Por que é melhor?</strong> Evita erros clássicos de esquecer o controle numérico ou errar o índice. Podemos usar <code>const</code> pois uma nova variável independente é criada a cada loop!</p>
+ </div>
+ </section>
+
+ <section id="funcoes" class="card">
+ <h2>24 a 30: Introdução e Anatomia das Funções</h2>
+
+ <h3>24: INTRODUÇÃO ÀS FUNÇÕES</h3>
+ <p>Funções são blocos de código 'empacotados' projetados para executar uma tarefa específica. Elas são os blocos de construção fundamentais da reutilização de código.</p>
+
+ <h3>25: ANATOMIA DE UMA FUNÇÃO (DECLARAÇÃO)</h3>
+<pre><code>function nomeDaFuncao(parametro1, parametro2) {
+ // Corpo da função (lógica)
+ return resultado; // opcional
+}</code></pre>
+
+ <h3>26: PARÂMETROS E ARGUMENTOS</h3>
+ <ul>
+ <li><strong>Parâmetros:</strong> Os nomes listados na definição da função (as variáveis locais).</li>
+ <li><strong>Argumentos:</strong> Os valores reais passados para a função quando ela é chamada (invocada).</li>
+ </ul>
+
+ <h3>27: A IMPORTÂNCIA DO 'RETURN'</h3>
+ <p>A palavra-chave <code>return</code> finaliza a execução da função e envia um valor de volta para quem a chamou. Sem <code>return</code>, a função executa a lógica mas retorna <code>undefined</code>.</p>
+
+ <h3>28: EXPRESSÕES DE FUNÇÃO</h3>
+ <p>Em JS, funções são 'cidadãos de primeira classe'. Podem ser armazenadas em variáveis.</p>
+<pre><code>const subtrair = function(a, b) {
+ return a - b;
+};</code></pre>
+
+ <h3>29: ARROW FUNCTIONS (SETA)</h3>
+ <p>A sintaxe moderna e curta introduzida no ES6. Muito usada em callbacks.</p>
+<pre><code>const multiplicar = (a, b) =&gt; {
+ return a * b;
+};</code></pre>
+
+ <h3>30: ARROW FUNCTIONS: RETORNO IMPLÍCITO</h3>
+ <p>Se a função tiver apenas uma linha de lógica que retorna algo, podemos remover as chaves e o <code>return</code>.</p>
+<pre><code>const dobro = n =&gt; n * 2;</code></pre>
+ <div class="callout callout-info">
+ <p><strong>📌 Uso Prático:</strong> Ideal para funções matemáticas simples ou manipulação rápida de dados.</p>
+ </div>
+ </section>
+
+ <section id="atividade2" class="card">
+ <h2>31: ATIVIDADE II: CRIANDO PEQUENAS LÓGICAS</h2>
+ <div class="callout callout-info">
+ <p><strong>=== Prática Individual ===</strong></p>
+ <p>Escreva no papel ou editor de texto 3 funções usando a sintaxe de Arrow Function com retorno implícito:</p>
+ <ul>
+ <li><code>isAdulto(idade)</code>: Retorna <code>true</code> se <code>idade &gt;= 18</code>.</li>
+ <li><code>getAreaQuadrado(lado)</code>: Retorna a área.</li>
+ <li><code>formatarReal(valor)</code>: Recebe um número e retorna uma string formatada (ex: Recebe 5, retorna <code>'R$ 5.00'</code>). Dica: use <code>.toFixed(2)</code></li>
+ </ul>
+ </div>
+ </section>
+
+ <section id="escopo" class="card">
+ <h2>32 e 33: Escopo de Variáveis</h2>
+
+ <h3>32: ESCOPO DE FUNÇÃO</h3>
+ <p>Variáveis definidas dentro de uma função não podem ser acessadas de fora dela.</p>
+<pre><code>function teste() {
+ const interna = 'segredo';
+}
+console.log(interna); // Erro: interna is not defined</code></pre>
+
+ <h3>33: ESCOPO GLOBAL</h3>
+ <p>Variáveis definidas fora de qualquer função ou bloco são globais e podem ser acessadas e modificadas por qualquer parte do script. Evite poluir o escopo global.</p>
+ </section>
+
+ <section id="utils" class="card">
+ <h2>34 a 38: Funções Utilitárias e a Biblioteca utils.js</h2>
+
+ <h3>34: INTRODUÇÃO ÀS FUNÇÕES UTILITÁRIAS</h3>
+ <p>Uma função utilitária (utility function) é uma função projetada para realizar uma tarefa comum, genérica e repetitiva em um projeto. Elas não pertencem à lógica de negócio específica, mas ajudam a construí-la.</p>
+
+ <h3>35: POR QUE CRIAR UMA UTILS.JS?</h3>
+ <ul>
+ <li><strong>DRY (Don't Repeat Yourself):</strong> Evita copiar e colar a mesma lógica (ex: formatação de data) em vários arquivos.</li>
+ <li><strong>Manutenibilidade:</strong> Se a lógica de formatação mudar, você muda em apenas um lugar.</li>
+ <li><strong>Organização:</strong> Mantém o código principal limpo e focado.</li>
+ </ul>
+
+ <h3>36: EXEMPLO ÚTIL: MASCARAR E-MAIL</h3>
+ <p>Uma função que pega <code>'contato@email.com'</code> e transforma em <code>'con***@email.com'</code>.</p>
+ <div class="callout callout-info">
+ <p><strong>📌 Aplicação:</strong> Segurança e privacidade ao exibir dados parciais do usuário na interface.</p>
+ </div>
+
+ <h3>37: EXEMPLO ÚTIL: GERAR ID ÚNICO</h3>
+<pre><code>const gerarId = () =&gt; {
+ return `id_${Date.now()}_${Math.random()}`;
+};</code></pre>
+ <div class="callout callout-info">
+ <p><strong>📌 Aplicação:</strong> Essencial para criar novos itens em uma lista dinamicamente e garantir que cada um tenha uma referência única.</p>
+ </div>
+
+ <h3>38: EXEMPLO ÚTIL: CAPITALIZAR TEXTO</h3>
+ <p>Transformar <code>'joão silva'</code> em <code>'João Silva'</code>. O JS não tem uma função nativa simples para isso.</p>
+ </section>
+
+ <section id="callbacks-timers" class="card">
+ <h2>39 a 41: Callbacks, Timers e Parâmetros Padrão</h2>
+
+ <h3>39: CALLBACKS: INTRODUÇÃO</h3>
+ <p>Um callback é uma função passada como argumento para outra função, para ser executada mais tarde.</p>
+<pre><code>setTimeout(() =&gt; {
+ console.log('Passou 1 segundo');
+}, 1000);</code></pre>
+
+ <h3>40: SETTIMEOUT E SETINTERVAL</h3>
+ <ul>
+ <li><strong>setTimeout:</strong> Executa a função callback UMA vez após um delay.</li>
+ <li><strong>setInterval:</strong> Executa a função callback repetidamente a cada intervalo de tempo.</li>
+ </ul>
+
+ <h3>41: PARÂMETROS PADRÃO (DEFAULT)</h3>
+ <p>No ES6+, você pode definir valores padrão para parâmetros caso nenhum argumento seja passado.</p>
+<pre><code>function saudacao(nome = 'Visitante') {
+ console.log(`Olá, ${nome}`);
+}</code></pre>
+ </section>
+
+ <section id="boas-praticas-modulos" class="card">
+ <h2>42 a 44: Boas Práticas e Módulos</h2>
+
+ <h3>42: BOAS PRÁTICAS EM FUNÇÕES</h3>
+ <ul>
+ <li>Nomeie funções com verbos (ex: <code>calcularTotal</code>, não <code>total</code>).</li>
+ <li>Uma função deve fazer APENAS UMA coisa (Princípio da Responsabilidade Única).</li>
+ <li>Mantenha as funções curtas e legíveis.</li>
+ <li>Use Arrow Functions para funções anônimas e callbacks.</li>
+ </ul>
+
+ <h3>43: O CONCEITO DE MÓDULO (PRÉVIA)</h3>
+ <p>Para usar o <code>utils.js</code> em outros arquivos, precisaremos exportar as funções dele e importá-las onde for necessário. No navegador moderno, usamos <code>export/import</code>.</p>
+
+ <h3>44: EXPORT E IMPORT (SINTAXE)</h3>
+<pre><code>// No utils.js
+export const dobro = n =&gt; n * 2;
+
+// No main.js
+import { dobro } from './utils.js';</code></pre>
+ </section>
+
+ <section id="atividade3-checklist" class="card">
+ <h2>45 e 46: Atividade III e Checklist de Entrega</h2>
+
+ <h3>45: ATIVIDADE III: IMPLEMENTANDO A UTILS.JS</h3>
+ <div class="callout callout-info">
+ <p><strong>=== Desafio Prático Final ===</strong></p>
+ <p>Vamos criar a base da nossa biblioteca utilitária do projeto. Crie um arquivo <code>utils.js</code> e implemente (e exporte) as seguintes funções:</p>
+ <ul>
+ <li><code>formatarMoeda(valor)</code>: Recebe um número, retorna string <code>'R$ X,XX'</code> (use <code>.toFixed(2)</code> e troque <code>'.'</code> por <code>','</code>).</li>
+ <li><code>validarEmail(email)</code>: Recebe string, retorna <code>true</code> se tiver <code>'@'</code> e <code>'.'</code> (use <code>.includes()</code>).</li>
+ <li><code>obterDataFormatada()</code>: Retorna a data atual no formato <code>'DD/MM/AAAA'</code> (use objeto <code>Date</code>).</li>
+ </ul>
+ </div>
+
+ <h3>46: CHECKLIST DE ENTREGA</h3>
+ <ul>
+ <li><strong>[ ]</strong> O arquivo <code>utils.js</code> foi criado?</li>
+ <li><strong>[ ]</strong> As 3 funções foram implementadas corretamente?</li>
+ <li><strong>[ ]</strong> As funções estão usando <code>const/let</code> corretamente e sintaxe moderna (Arrow Functions onde couber)?</li>
+ <li><strong>[ ]</strong> Todas as funções foram exportadas usando <code>export</code>?</li>
+ </ul>
+ </section>
+
+ <section id="conclusao" class="card">
+ <h2>47: CONCLUSÃO</h2>
+ <div class="callout callout-info">
+ <p><strong> Base Sólida, Futuro Promissor </strong></p>
+ <p>Dominar variáveis, tipos e funções é o passo mais importante no desenvolvimento web. Com a <code>utils.js</code>, você começa a pensar como um engenheiro de software: criando ferramentas reutilizáveis e organizadas.</p>
+ </div>
+ </section>
+ </main>
+
+ <footer>
+ <p>&copy; SENAI — Serviço Nacional de Aprendizagem Industrial.</p>
+ </footer>
+
+ <script>
+ console.log("Página da Aula 05 carregada com sucesso!");
+ </script>
+
+</body>
+</html>
