@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON e Tecnologias de Requisição HTTP</title>
+    <style>
+        :root {
+            --primary: #00264d; /* Azul Escuro */
+            --secondary: #0056b3; /* Azul Médio */
+            --accent: #e6f2ff; /* Azul Muito Claro */
+            --text: #333;
+            --white: #ffffff;
+            --code-bg: #1e1e1e;
+            --practice-bg: #f0f7ff;
+            --practice-border: #0056b3;
+            --hl-keyword: #ff79c6; /* Rosa para keywords JS */
+            --hl-string: #f1fa8c; /* Amarelo para strings */
+            --hl-comment: #6272a4; /* Cinza para comentários */
+            --hl-builtin: #8be9fd; /* Ciano para built-ins */
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary);
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            padding: 60px 100px;
+            box-sizing: border-box;
+            animation: fadeIn 0.5s ease-out;
+            overflow-y: auto;
+        }
+
+        .slide.active { 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        h1 { font-size: 3.2rem; color: var(--primary); margin-bottom: 20px; border-left: 20px solid var(--secondary); padding-left: 25px; line-height: 1.1; }
+        h2 { font-size: 2.4rem; color: var(--secondary); margin-top: 15px; }
+        p, li { font-size: 1.6rem; line-height: 1.5; color: var(--text); }
+        ul { margin-top: 10px; }
+        li { margin-bottom: 10px; }
+        
+        pre { 
+            background: var(--code-bg); 
+            color: #f8f8f2; /* Default text color in dark code */
+            padding: 25px; 
+            border-radius: 12px; 
+            font-size: 1.3rem;
+            margin: 20px 0;
+            border-left: 10px solid var(--secondary);
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+        }
+
+        /* Syntax Highlighting Simples */
+        .kd { color: var(--hl-keyword); } /* keyword/declaration */
+        .s { color: var(--hl-string); }   /* string */
+        .c { color: var(--hl-comment); }  /* comment */
+        .bi { color: var(--hl-builtin); } /* builtin */
+
+        .practice-box {
+            background: var(--practice-bg);
+            border-left: 8px solid var(--practice-border);
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .practice-box b { color: var(--secondary); text-transform: uppercase; font-size: 1.1rem; display: block; margin-bottom: 8px; }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        button {
+            padding: 12px 28px;
+            background: var(--primary);
+            color: white;
+            border: 2px solid var(--white);
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        button:hover { background: var(--secondary); transform: translateY(-2px); }
+        
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 8px;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+            z-index: 101;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            color: var(--primary);
+            background: var(--accent);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+<div class="slide-container" id="container"></div>
+<div class="slide-counter" id="counter">1 / 38</div>
+
+<div class="controls">
+    <button onclick="prev()">⬅ Anterior</button>
+    <button onclick="next()">Próximo ➡</button>
+</div>
+
+<script>
+    const slidesData = [
+        {
+                "t": "JSON e Tecnologias de Requisição HTTP",
+                "c": "<h2>Consumindo APIs com Confiança</h2><p>Nesta aula vamos entender o formato JSON, a linguagem do protocolo HTTP e as principais tecnologias usadas para fazer requisições no JavaScript: XMLHttpRequest, Fetch API e Axios.</p>"
+        },
+        {
+                "t": "Objetivos da Aula",
+                "c": "<ul><li>Explicar o que é JSON, para que serve e por que se tornou o formato padrão de troca de dados na web;</li><li>Ler e escrever estruturas JSON válidas, reconhecendo seus tipos de dados;</li><li>Converter dados entre JSON e objetos JavaScript usando <code>JSON.parse()</code> e <code>JSON.stringify()</code>;</li><li>Reconhecer métodos HTTP, códigos de status e cabeçalhos usados no consumo de APIs;</li><li>Realizar requisições HTTP com Fetch API e Axios, comparando as duas abordagens;</li><li>Aplicar esses conhecimentos em uma atividade prática de consumo de uma API pública.</li></ul>"
+        },
+        {
+                "t": "O que é JSON?",
+                "c": "<p><b>JSON</b> (JavaScript Object Notation) é um formato leve de troca de dados, baseado em texto e fácil de ler tanto para humanos quanto para máquinas.</p><p>Apesar do nome remeter ao JavaScript, o JSON é independente de linguagem: praticamente todas as linguagens de programação modernas sabem lê-lo e gerá-lo.</p><div class='practice-box'><b>Uso Prático:</b> É hoje o formato mais usado para troca de dados entre cliente e servidor em APIs REST.</div>"
+        },
+        {
+                "t": "JSON x XML: Por que o JSON Venceu?",
+                "c": "<ul><li><b>Verbosidade:</b> JSON é mais enxuto; XML usa tags de abertura e fechamento.</li><li><b>Legibilidade:</b> a estrutura do JSON é próxima da de objetos, mais intuitiva.</li><li><b>Suporte nativo em JS:</b> JSON é literalmente um objeto JavaScript; XML exige parser externo.</li><li><b>Tamanho do payload:</b> JSON gera respostas menores, mais rápidas de trafegar.</li></ul>"
+        },
+        {
+                "t": "XML x JSON na Prática",
+                "c": "<p>Vamos representar o mesmo cadastro de aluno nos dois formatos e comparar:</p><p><b>XML:</b></p><pre>&lt;aluno&gt;\n  &lt;nome&gt;Maria Silva&lt;/nome&gt;\n  &lt;idade&gt;19&lt;/idade&gt;\n  &lt;curso&gt;Informática para Internet&lt;/curso&gt;\n  &lt;ativo&gt;true&lt;/ativo&gt;\n&lt;/aluno&gt;</pre><p><b>JSON:</b></p><pre><span class='c'>{</span>\n  <span class='bi'>\"nome\"</span>: <span class='s'>\"Maria Silva\"</span>,\n  <span class='bi'>\"idade\"</span>: <span class='s'>19</span>,\n  <span class='bi'>\"curso\"</span>: <span class='s'>\"Informática para Internet\"</span>,\n  <span class='bi'>\"ativo\"</span>: <span class='kd'>true</span>\n<span class='c'>}</span></pre><div class='practice-box'><b>Na prática:</b> o JSON representa a mesma informação sem repetir o nome de cada campo em tags de abertura e fechamento — menos caracteres, menos peso na resposta da API e leitura mais direta.</div>"
+        },
+        {
+                "t": "Um Primeiro Exemplo",
+                "c": "<p>Um cadastro de aluno representado em JSON:</p><pre><span class='bi'>\"nome\"</span>: <span class='s'>\"Maria Silva\"</span>,\n<span class='bi'>\"idade\"</span>: <span class='s'>19</span>,\n<span class='bi'>\"curso\"</span>: <span class='s'>\"Informática para Internet\"</span>,\n<span class='bi'>\"ativo\"</span>: <span class='kd'>true</span></pre><p>Note a semelhança com um objeto JavaScript: chaves <code>{ }</code>, pares chave/valor separados por dois-pontos, e vírgulas separando cada par.</p>"
+        },
+        {
+                "t": "Regras Fundamentais de Sintaxe",
+                "c": "<ul><li>Os dados são organizados em pares <b>chave/valor</b>: <code>\"chave\": valor</code>;</li><li>As chaves são sempre strings, escritas entre <b>aspas duplas</b> (nunca aspas simples);</li><li>Os valores podem ser: string, number, boolean, null, object ou array;</li><li>Pares são separados por vírgula — mas não pode haver vírgula depois do último par;</li><li>Objetos são delimitados por chaves <code>{ }</code>, arrays por colchetes <code>[ ]</code>.</li></ul>"
+        },
+        {
+                "t": "Tipos de Dados Suportados",
+                "c": "<ul><li><b>string:</b> texto entre aspas duplas — <code>\"nome\": \"Ana\"</code></li><li><b>number:</b> inteiro ou decimal, sem aspas — <code>\"idade\": 19</code></li><li><b>boolean:</b> true ou false — <code>\"ativo\": true</code></li><li><b>null:</b> ausência de valor — <code>\"telefone\": null</code></li><li><b>object:</b> pares chave/valor aninhados — <code>\"endereco\": { \"cidade\": \"Joinville\" }</code></li><li><b>array:</b> lista ordenada de valores — <code>\"notas\": [8.5, 9.0, 7.0]</code></li></ul>"
+        },
+        {
+                "t": "Exemplo Progressivo — Nível 1",
+                "c": "<p>Chave/valor simples:</p><pre><span class='c'>{</span>\n  <span class='bi'>\"produto\"</span>: <span class='s'>\"Teclado mecânico\"</span>,\n  <span class='bi'>\"preco\"</span>: <span class='s'>249.90</span>,\n  <span class='bi'>\"disponivel\"</span>: <span class='kd'>true</span>\n<span class='c'>}</span></pre>"
+        },
+        {
+                "t": "Exemplo Progressivo — Nível 2: Objeto Aninhado",
+                "c": "<p>Objetos podem conter outros objetos dentro deles:</p><pre><span class='c'>{</span>\n  <span class='bi'>\"nome\"</span>: <span class='s'>\"Maria Silva\"</span>,\n  <span class='bi'>\"endereco\"</span>: {\n    <span class='bi'>\"rua\"</span>: <span class='s'>\"Rua das Palmeiras\"</span>,\n    <span class='bi'>\"numero\"</span>: <span class='s'>120</span>,\n    <span class='bi'>\"cidade\"</span>: <span class='s'>\"Joinville\"</span>\n  }\n<span class='c'>}</span></pre>"
+        },
+        {
+                "t": "Exemplo Progressivo — Nível 3: Array de Objetos",
+                "c": "<p>O formato mais comum em respostas de APIs: uma lista de registros.</p><pre><span class='c'>{</span>\n  <span class='bi'>\"turma\"</span>: <span class='s'>\"T INF 2025/1 V2\"</span>,\n  <span class='bi'>\"alunos\"</span>: [\n    { <span class='bi'>\"nome\"</span>: <span class='s'>\"Maria Silva\"</span>, <span class='bi'>\"nota\"</span>: <span class='s'>8.5</span> },\n    { <span class='bi'>\"nome\"</span>: <span class='s'>\"João Souza\"</span>, <span class='bi'>\"nota\"</span>: <span class='s'>7.2</span> }\n  ]\n<span class='c'>}</span></pre>"
+        },
+        {
+                "t": "Atividade: Encontre os Erros",
+                "c": "<h2>Desafio Rápido</h2><p>Identifiquem os <b>três erros</b> de sintaxe abaixo antes de validar em jsonlint.com:</p><pre><span class='c'>{</span>\n  <span class='s'>'nome'</span>: <span class='s'>'Carlos Lima'</span>,\n  <span class='bi'>\"idade\"</span>: <span class='s'>22</span>,\n  <span class='bi'>\"curso\"</span>: <span class='s'>\"Redes de Computadores\"</span>,\n<span class='c'>}</span></pre>"
+        },
+        {
+                "t": "Gabarito do Desafio",
+                "c": "<div class='practice-box'><b>Correção:</b> (1) aspas simples em <code>'nome'</code> e <code>'Carlos Lima'</code> — JSON exige aspas duplas; (2) vírgula sobrando depois do último par; (3) chaves sem aspas ou numéricas também seriam inválidas.</div>"
+        },
+        {
+                "t": "JSON em JavaScript",
+                "c": "<p>Embora o JSON seja apenas texto, para usá-lo dentro de um programa é preciso convertê-lo em uma estrutura de dados nativa (objeto/array) e vice-versa.</p><p>O JavaScript oferece o objeto global <code>JSON</code> para isso, com dois métodos principais.</p>"
+        },
+        {
+                "t": "JSON.parse(): De Texto para Objeto",
+                "c": "<pre><span class='kd'>const</span> textoJSON = <span class='s'>'{\"nome\": \"Ana\", \"idade\": 20}'</span>;\n\n<span class='kd'>const</span> objeto = <span class='bi'>JSON</span>.parse(textoJSON);\n\nconsole.log(objeto.nome); <span class='c'>// \"Ana\"</span>\nconsole.log(objeto.idade); <span class='c'>// 20</span></pre><div class='practice-box'><b>Conexão:</b> é exatamente o que acontece quando chamamos <code>resposta.json()</code> em uma requisição Fetch.</div>"
+        },
+        {
+                "t": "JSON.stringify(): De Objeto para Texto",
+                "c": "<pre><span class='kd'>const</span> aluno = {\n  nome: <span class='s'>\"Pedro Alves\"</span>,\n  idade: <span class='s'>21</span>,\n  aprovado: <span class='kd'>true</span>\n};\n\n<span class='kd'>const</span> textoJSON = <span class='bi'>JSON</span>.stringify(aluno);\n\nconsole.log(textoJSON);\n<span class='c'>// '{\"nome\":\"Pedro Alves\",\"idade\":21,\"aprovado\":true}'</span></pre>"
+        },
+        {
+                "t": "Formatando a Saída para Leitura Humana",
+                "c": "<p><code>JSON.stringify()</code> aceita um terceiro parâmetro para indentação, muito usado durante o desenvolvimento e depuração:</p><pre>console.log(<span class='bi'>JSON</span>.stringify(aluno, <span class='kd'>null</span>, <span class='s'>2</span>));\n<span class='c'>// {</span>\n<span class='c'>//   \"nome\": \"Pedro Alves\",</span>\n<span class='c'>//   \"idade\": 21,</span>\n<span class='c'>//   \"aprovado\": true</span>\n<span class='c'>// }</span></pre>"
+        },
+        {
+                "t": "Erros Comuns com JSON.parse",
+                "c": "<ul><li>Tentar dar parse em um texto que não é JSON válido (ex: aspas simples) — lança <code>SyntaxError</code>;</li><li>Esquecer que o resultado é um objeto <b>novo</b>, sem métodos da classe original;</li><li>Chamar <code>JSON.parse()</code> em algo que já é um objeto.</li></ul><div class='practice-box'><b>Boas Práticas:</b> sempre envolva <code>JSON.parse()</code> em um bloco try/catch quando o texto vier de uma fonte externa.</div>"
+        },
+        {
+                "t": "Importando JSON de um Arquivo Local",
+                "c": "<p>Além de consumir uma API remota, muitas vezes precisamos carregar um arquivo <code>.json</code> salvo no próprio projeto — útil para dados de teste (mocks) ou configurações locais.</p><p><b>Arquivo na mesma pasta do script</b> (<code>alunos.json</code>):</p><pre><span class='c'>// estrutura do projeto</span>\nprojeto/\n  index.html\n  script.js\n  alunos.json</pre><p>Carregando com Fetch API:</p><pre><span class='kd'>async</span> <span class='kd'>function</span> <span class='bi'>carregarAlunos</span>() {\n  <span class='kd'>const</span> resposta = <span class='kd'>await</span> <span class='bi'>fetch</span>(<span class='s'>\"./alunos.json\"</span>);\n  <span class='kd'>const</span> dados = <span class='kd'>await</span> resposta.json();\n  console.log(dados);\n}</pre><div class='practice-box'><b>Atenção:</b> arquivos locais só carregam via <code>fetch()</code> quando o projeto está sendo servido por um servidor (ex: Live Server) — abrir o HTML direto pelo navegador (protocolo file://) costuma bloquear a requisição.</div>"
+        },
+        {
+                "t": "Importando JSON de um Subdiretório (/dados)",
+                "c": "<p>Quando os arquivos JSON ficam organizados em uma subpasta, basta ajustar o caminho relativo na chamada do <code>fetch()</code>.</p><pre><span class='c'>// estrutura do projeto</span>\nprojeto/\n  index.html\n  script.js\n  dados/\n    alunos.json\n    professores.json</pre><pre><span class='kd'>async</span> <span class='kd'>function</span> <span class='bi'>carregarAlunos</span>() {\n  <span class='kd'>const</span> resposta = <span class='kd'>await</span> <span class='bi'>fetch</span>(<span class='s'>\"./dados/alunos.json\"</span>);\n  <span class='kd'>const</span> dados = <span class='kd'>await</span> resposta.json();\n  console.log(dados);\n}</pre><p>Forma equivalente usando <i>import</i> de módulos ES (compatível com bundlers modernos):</p><pre><span class='kd'>import</span> dados <span class='kd'>from</span> <span class='s'>\"./dados/alunos.json\"</span> <span class='kd'>with</span> { type: <span class='s'>\"json\"</span> };\n\nconsole.log(dados);</pre>"
+        },
+        {
+                "t": "Lendo e Salvando JSON com Node.js (fs)",
+                "c": "<p>No <b>Node.js</b>, o módulo <code>fs</code> permite ler e gravar arquivos JSON diretamente — sem servidor HTTP.</p><pre><span class='kd'>const</span> fs = <span class='bi'>require</span>(<span class='s'>'fs'</span>);\n\n<span class='c'>// Ler arquivo JSON</span>\n<span class='kd'>const</span> dados = <span class='bi'>JSON</span>.parse(\n  fs.readFileSync(<span class='s'>'./alunos.json'</span>, <span class='s'>'utf8'</span>)\n);\n\nconsole.log(dados);</pre><div class='practice-box'><b>Diferença-chave:</b> no navegador usamos <code>fetch()</code>; no Node.js usamos <code>fs</code>. O resultado é o mesmo — um objeto JavaScript pronto para uso.</div>"
+        },
+        {
+                "t": "Exemplo: Modificando e Salvando JSON",
+                "c": "<p>Uma operação comum: carregar, modificar e salvar de volta ao arquivo.</p><pre><span class='kd'>const</span> fs = <span class='bi'>require</span>(<span class='s'>'fs'</span>);\n\n<span class='c'>// 1. Ler</span>\n<span class='kd'>let</span> alunos = <span class='bi'>JSON</span>.parse(\n  fs.readFileSync(<span class='s'>'./alunos.json'</span>, <span class='s'>'utf8'</span>)\n);\n\n<span class='c'>// 2. Modificar</span>\nalunos.push({ nome: <span class='s'>\"Zeca\"</span>, nota: <span class='s'>8.2</span> });\n\n<span class='c'>// 3. Salvar</span>\nfs.writeFileSync(\n  <span class='s'>'./alunos.json'</span>,\n  <span class='bi'>JSON</span>.stringify(alunos, <span class='kd'>null</span>, <span class='s'>2</span>),\n  <span class='s'>'utf-8'</span>\n);</pre><div class='practice-box'><b>Boas Práticas:</b> use <code>JSON.stringify(dados, null, 2)</code> para salvar com indentação legível. Sempre trate erros com <code>try/catch</code> ao ler ou gravar arquivos.</div>"
+        },
+        {
+                "t": "Fundamentos de HTTP para Consumo de APIs",
+                "c": "<p>Antes de fazer requisições, é essencial entender a linguagem que o navegador e o servidor usam para conversar: o protocolo <b>HTTP</b>.</p>"
+        },
+        {
+                "t": "Métodos HTTP e sua Relação com CRUD",
+                "c": "<ul><li><b>GET</b> — consultar/ler dados (ex: buscar a lista de alunos);</li><li><b>POST</b> — criar um novo recurso (ex: cadastrar um novo aluno);</li><li><b>PUT</b> — atualizar um recurso por completo;</li><li><b>PATCH</b> — atualizar parcialmente um recurso;</li><li><b>DELETE</b> — remover um recurso.</li></ul>"
+        },
+        {
+                "t": "Códigos de Status HTTP Mais Comuns",
+                "c": "<ul><li><b>200 OK</b> — requisição bem-sucedida;</li><li><b>201 Created</b> — recurso criado com sucesso (comum após POST);</li><li><b>204 No Content</b> — sucesso sem corpo de resposta (comum após DELETE);</li><li><b>400 Bad Request</b> — dados enviados de forma inválida;</li><li><b>401 Unauthorized</b> — falta de autenticação;</li><li><b>404 Not Found</b> — recurso não encontrado;</li><li><b>500 Internal Server Error</b> — erro inesperado no servidor.</li></ul>"
+        },
+        {
+                "t": "Cabeçalhos (Headers) Importantes",
+                "c": "<ul><li><b>Content-Type:</b> informa o formato do corpo enviado/recebido (ex: <code>application/json</code>);</li><li><b>Accept:</b> informa o formato de resposta esperado pelo cliente;</li><li><b>Authorization:</b> envia credenciais/token de autenticação (ex: <code>Bearer eyJhbGciOi...</code>).</li></ul><div class='practice-box'><b>Conexão com Segurança:</b> o Authorization nunca deve conter chaves fixas escritas diretamente no código front-end público.</div>"
+        },
+        {
+                "t": "Tecnologias de Requisição HTTP",
+                "c": "<p>Existem diferentes formas de fazer uma requisição HTTP a partir do JavaScript no navegador. Vamos conhecer três, da mais antiga à mais usada atualmente.</p>"
+        },
+        {
+                "t": "XMLHttpRequest (XHR): A Forma Clássica",
+                "c": "<p>API original do navegador Google Chrome, hoje considerada verbosa, mas ainda presente em sistemas legados:</p><pre><span class='kd'>const</span> xhr = <span class='kd'>new</span> <span class='bi'>XMLHttpRequest</span>();\nxhr.open(<span class='s'>\"GET\"</span>, <span class='s'>\"https://viacep.com.br/ws/89201000/json/\"</span>);\nxhr.onload = <span class='kd'>function</span> () {\n  <span class='kd'>if</span> (xhr.status === <span class='s'>200</span>) {\n    <span class='kd'>const</span> dados = <span class='bi'>JSON</span>.parse(xhr.responseText);\n    console.log(dados);\n  }\n};\nxhr.send();</pre><div class='practice-box'><b>Para testar o código:</b> Abra o Google Chrome, abra o DevTools (F12). Vá até a aba <code>Sources</code>, depois na sub aba <code>Snippets</code>. Crie um novo Snippet chamado <code>teste.js</code>.</div>"
+        },
+        {
+                "t": "Fetch API: O Padrão Moderno",
+                "c": "<p>Nativa do JavaScript, baseada em Promises, mais limpa que o XHR:</p><pre><span class='bi'>fetch</span>(<span class='s'>\"https://viacep.com.br/ws/89201000/json/\"</span>)\n  .then((resposta) => resposta.json())\n  .then((dados) => console.log(dados))\n  .catch((erro) => console.error(<span class='s'>\"Erro na requisição:\"</span>, erro));</pre><div class='practice-box'><b>Para testar o código:</b> Abra o VS Code e crie um novo arquivo chamado <code>teste.js</code> e cole o código acima para teste no <code>Terminal</code>.</div>"
+        },
+        {
+                "t": "Fetch API com async/await",
+                "c": "<p>Forma recomendada em código atual:</p><pre><span class='kd'>async</span> <span class='kd'>function</span> <span class='bi'>buscarCep</span>(cep) {\n  <span class='kd'>try</span> {\n    <span class='kd'>const</span> resposta = <span class='kd'>await</span> <span class='bi'>fetch</span>(<span class='s'>`https://viacep.com.br/ws/${cep}/json/`</span>);\n    <span class='kd'>if</span> (!resposta.ok) {\n      <span class='kd'>throw new</span> Error(<span class='s'>`Erro HTTP: ${resposta.status}`</span>);\n    }\n    <span class='kd'>const</span> dados = <span class='kd'>await</span> resposta.json();\n    console.log(dados);\n  } <span class='kd'>catch</span> (erro) {\n    console.error(<span class='s'>\"Não foi possível buscar o CEP:\"</span>, erro);\n  }\n}</pre><div class='practice-box'><b>Atenção:</b> o fetch() só rejeita a Promise em falhas de rede — um erro 404/500 chega como \"sucesso\". Por isso é preciso checar <code>resposta.ok</code>.</div>"
+        },
+        {
+                "t": "Axios: Biblioteca Externa Popular",
+                "c": "<p>Simplifica tarefas que no Fetch exigem passos extras:</p><pre><span class='kd'>async</span> <span class='kd'>function</span> <span class='bi'>buscarCep</span>(cep) {\n  <span class='kd'>try</span> {\n    <span class='kd'>const</span> resposta = <span class='kd'>await</span> <span class='bi'>axios</span>.get(<span class='s'>`https://viacep.com.br/ws/${cep}/json/`</span>);\n    console.log(resposta.data); <span class='c'>// já vem convertido de JSON</span>\n  } <span class='kd'>catch</span> (erro) {\n    console.error(<span class='s'>\"Não foi possível buscar o CEP:\"</span>, erro);\n  }\n}</pre><div class='practice-box'><b>Para testar o código:</b> Abra o VS Code e crie um novo arquivo chamado <code>teste.js</code> e cole o código acima. No <code>Terminal</code> rode o comando <code>npm install axios</code>.</div>"
+        },
+        {
+                "t": "Fetch x Axios: Comparação",
+                "c": "<ul><li><b>Conversão de JSON:</b> manual (<code>resposta.json()</code>) no Fetch; automática (<code>resposta.data</code>) no Axios;</li><li><b>Erros HTTP (4xx/5xx):</b> Fetch não rejeita sozinho; Axios rejeita a Promise automaticamente;</li><li><b>Instalação:</b> Fetch é nativo do navegador; Axios exige biblioteca externa;</li><li><b>Headers padrão:</b> no Axios podem ser definidos uma única vez por instância.</li></ul>"
+        },
+        {
+                "t": "Atividade Prática: Explorando o JSON",
+                "c": "<h2>Consumindo uma API Pública</h2><p><b>Objetivo:</b> manipular JSON real, comparar Fetch e Axios, e observar o efeito de cabeçalhos HTTP em uma requisição.</p><p><b>Materiais:</b> navegador com console, Postman/Insomnia, VS Code com Live Server, acesso à internet.</p>"
+        },
+        {
+                "t": "Passo a Passo da Atividade",
+                "c": "<ol><li>No Postman, faça um GET para <code>viacep.com.br/ws/89201000/json/</code> e observe a resposta JSON bruta.</li><li>Implemente <code>buscarCep()</code> usando Fetch API com async/await, exibindo os dados na página.</li><li>Duplique a função usando Axios (via CDN) e compare a quantidade de código necessária.</li><li>Desafio: altere o header <code>Accept</code> no Postman e observe se a resposta muda.</li><li>Desafio extra: testem um CEP inexistente e tratem o erro usando <code>resposta.ok</code>.</li></ol>"
+        },
+        {
+                "t": "Entregável da Atividade",
+                "c": "<p>Um arquivo HTML funcional contendo as duas implementações (Fetch e Axios) e uma anotação curta (2 a 3 linhas) comparando as duas abordagens.</p><div class='practice-box'><b>Dica para o Docente:</b> circule pela turma e questione: \"o que aconteceria se essa API estivesse fora do ar agora?\" — isso antecipa a discussão de tratamento de erros da próxima aula.</div>"
+        },
+        {
+                "t": "Checklist de Aprendizagem",
+                "c": "<ul><li>Sei explicar o que é JSON e por que ele é usado nas APIs;</li><li>Consigo escrever um JSON válido com objetos, arrays e diferentes tipos de dados;</li><li>Sei diferenciar <code>JSON.parse()</code> de <code>JSON.stringify()</code>;</li><li>Conheço os principais métodos HTTP e sua relação com CRUD;</li><li>Sei interpretar os códigos de status HTTP mais comuns;</li><li>Consigo fazer uma requisição GET usando Fetch API e usando Axios.</li></ul>"
+        },
+        {
+                "t": "Perguntas para Discussão",
+                "c": "<ul><li>Por que o Axios se tornou tão popular mesmo o Fetch já sendo nativo do navegador?</li><li>Em que situação faria sentido usar XMLHttpRequest hoje em dia?</li><li>Que riscos de segurança existem ao trabalhar com dados JSON vindos de uma API externa?</li></ul>"
+        },
+        {
+                "t": "Conclusão",
+                "c": "<h2>Base Sólida para Consumir APIs</h2><p>Dominar JSON, HTTP e as tecnologias de requisição é o alicerce para qualquer aplicação front-end que se conecte a um servidor. Na próxima aula, vamos aplicar tudo isso nas operações completas de CRUD.</p>"
+        }
+];
+
+    let current = 0;
+    const container = document.getElementById('container');
+    const counterDisplay = document.getElementById('counter');
+    const progress = document.getElementById('progress');
+
+    function render() {
+        container.innerHTML = '';
+        slidesData.forEach((s, i) => {
+            const div = document.createElement('div');
+            div.className = `slide ${i === current ? 'active' : ''}`;
+            // Adiciona título apenas se definido
+            const titleHtml = s.t ? `<h1>${s.t}</h1>` : '';
+            div.innerHTML = `${titleHtml}${s.c}`;
+            container.appendChild(div);
+        });
+        counterDisplay.innerText = `${current + 1} / ${slidesData.length}`;
+        progress.style.width = `${((current + 1) / slidesData.length) * 100}%`;
+    }
+
+    function next() { if(current < slidesData.length - 1) { current++; render(); } }
+    function prev() { if(current > 0) { current--; render(); } }
+
+    document.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowRight' || e.key === ' ') next();
+        if(e.key === 'ArrowLeft') prev();
+    });
+
+    render();
+</script>
+</body>
+</html>

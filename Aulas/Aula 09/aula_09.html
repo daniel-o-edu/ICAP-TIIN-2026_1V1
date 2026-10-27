@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 09 - Segurança da Informação e Boas Práticas no Consumo de APIs</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background-color: #f4f6f8;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #1e293b;
+      color: #ffffff;
+      padding: 1.2rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .header-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-title h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.2rem;
+      color: #38bdf8;
+    }
+
+    .header-title span {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+    }
+
+    nav a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #38bdf8;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      color: #1e293b;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.4rem;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      color: #0369a1;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #475569;
+    }
+
+    ul, ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+      color: #475569;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      background-color: #fff;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border: 1px solid #e2e8f0;
+    }
+
+    th {
+      background-color: #1e293b;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    code {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 1.2rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+
+    pre code {
+      background-color: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .callout {
+      background-color: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      padding: 1rem 1.25rem;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    .callout-warning {
+      background-color: #fffbeb;
+      border-left-color: #f59e0b;
+    }
+
+    .callout-info {
+      background-color: #f0fdf4;
+      border-left-color: #16a34a;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #0284c7;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #0369a1;
+    }
+
+    footer {
+      background-color: #1e293b;
+      color: #94a3b8;
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: auto;
+    }
+
+    footer p {
+      color: #94a3b8;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="header-title">
+        <h2>SENAI — Serviço Nacional de Aprendizagem Industrial</h2>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#objetivos">Objetivos</a></li>
+          <li><a href="#pilares-seguranca">Pilares da Segurança</a></li>
+          <li><a href="#boas-praticas">Boas Práticas</a></li>
+          <li><a href="#politicas-navegador">Políticas do Navegador</a></li>
+          <li><a href="#autogestao-disciplina">Autogestão e Disciplina</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h1>Aula 09 - Segurança da Informação e Boas Práticas no Consumo de APIs</h1>
+      <p><strong>Descrição:</strong> Esta aula introduz os conceitos fundamentais de segurança necessários ao projetar e codificar interfaces que se comunicam com APIs. O foco será implementar estratégias client-side que respeitem as políticas do servidor, compreendendo que a segurança começa e termina com a proteção dos dados manipulados pela aplicação.</p>
+    </section>
+
+    <section id="objetivos" class="card">
+      <h2>Objetivos da Aula</h2>
+      <ul>
+        <li>Aplicar boas práticas de segurança durante a integração de serviços web.</li>
+        <li>Compreender e proteger as operações CRUD (Create, Read, Update, Delete) no front-end.</li>
+        <li>Implementar restrições básicas de segurança na interface client-side.</li>
+        <li>Desenvolver a disciplina da programação defensiva e autogestão.</li>
+      </ul>
+    </section>
+
+    <section id="pilares-seguranca" class="card">
+      <h2>Os Dados São o Tesouro e os Pilares da Segurança</h2>
+
+      <h3>O que acontece quando o Instagram de alguém é hackeado?</h3>
+      
+      <h3>A Segurança da Informação e seus Pilares no Front-End</h3>
+      <p>O foco principal de qualquer estratégia de segurança não está apenas em se proteger de hackers ou proteger a rede, mas sim em proteger os dados gerados, acessados e manipulados pelas operações CRUD da aplicação. Os dados são o recurso mais importante que qualquer negócio possui, sendo o verdadeiro foco da segurança, muito além da simples preocupação com hackers, aplicações ou infraestrutura de rede. A interação de uma aplicação com os dados baseia-se em quatro operações fundamentais conhecidas pelo acrônimo CRUD: Create (Criar), Read (Ler), Update (Atualizar) e Delete (Apagar). Manter esses dados protegidos exige o entendimento pleno das ameaças no ambiente web que envolvem essas operações de interface.</p>
+
+      <h3>Confidencialidade e Integridade</h3>
+      <p>Garantir que os dados não sejam roubados, corrompidos, modificados indevidamente ou apagados por entidades não autorizadas, prevenindo injeções de código malicioso. Para garantir a Confidencialidade e Integridade, é essencial evitar que os dados sejam modificados, corrompidos, roubados ou apagados, cenários críticos que podem causar perdas sérias e até mesmo a extinção de um negócio. A aplicação front-end deve ter controle estrito sobre como interage com as informações, gerenciando os dados sem danificá-los ou causar vazamentos.</p>
+
+      <h3>Disponibilidade</h3>
+      <p>Compreender a inter-relação entre velocidade, confiabilidade e segurança. Uma aplicação segura demais pode se tornar inutilizável ou lenta, enquanto uma aplicação sem proteções pode falhar sob carga de ataques (como negação de serviço - DoS), tornando-se indisponível. O pilar da Disponibilidade está intimamente ligado ao desempenho e à usabilidade do sistema. Existe uma inter-relação direta entre a velocidade, a confiabilidade e a segurança de uma aplicação. Não é possível dar destaque excessivo a apenas um desses aspectos sem que a aplicação seja prejudicada de alguma forma (por exemplo, excesso de verificações tornando a interface lenta ou inutilizável). Aplicações devidamente balanceadas têm bom desempenho e tratam os dados de forma confiável e eficiente, garantindo a segurança sem representar um peso excessivo ou frustração para o usuário final.</p>
+
+      <h3>Ocultação de Dados (Data Hiding)</h3>
+      <p>Disciplina para fornecer e exibir ao usuário final apenas a quantidade de informações estritamente necessária para executar uma tarefa específica na interface, reduzindo a superfície de exposição. Muitas aplicações falham ao deixar informações e recursos excessivos disponíveis na interface, o que aumenta a superfície de ataque e oferece mais oportunidades para um invasor ter acesso ao sistema. Livrar-se de recursos desnecessários ou transferi-los para fora do acesso direto do cliente reduz drasticamente essa superfície, tornando a aplicação client-side muito mais segura.</p>
+
+      <div class="callout callout-info">
+        <p><strong>Atividade: Análise de uma interface real</strong></p>
+        <p>Os alunos devem debater quais informações estão ocultas e quais estão visíveis para o usuário comum.</p>
+      </div>
+    </section>
+
+    <section id="boas-praticas" class="card">
+      <h2>Boas Práticas: Do Controle de Acesso à Criptografia</h2>
+
+      <h3>Controle de Acesso e Autenticação</h3>
+      <p>No desenvolvimento de interfaces seguras, é fundamental ter certeza sobre com quem a aplicação está interagindo. Deve-se evitar o uso de contas de convidado genéricas para qualquer finalidade, atribuindo sempre uma conta específica a cada usuário. Mesmo quando a identidade do usuário é conhecida, é importante fornecer apenas o nível de autorização estritamente necessário para que ele execute uma determinada tarefa. Qualquer medida que limite o que o usuário está autorizado a fazer contribui significativamente para manter um ambiente seguro. Outro cuidado essencial é a eliminação da autenticação fixa: os desenvolvedores muitas vezes deixam credenciais (hardcoded) em arquivos de inicialização para testes, sendo imprescindível remover esses dados do código-fonte e utilizar áreas de armazenamento centralizadas e fora da raiz da aplicação web.</p>
+
+      <h3>Criptografia e Canais Seguros (TLS/SSL)</h3>
+      <p>Todas as transmissões de dados entre o client-side e o servidor devem ocorrer através de conexões seguras, evitando ataques de interceptação (man-in-the-middle). No front-end, dados extremamente sensíveis (como senhas, tokens vitais ou dados bancários) nunca devem ser armazenados em disco (armazenamento local) de forma não criptografada, pois ficam acessíveis a usuários do mesmo computador ou a spywares.</p>
+      <p>Para proteger os dados em trânsito, a criptografia é indispensável nas transmissões entre dois endpoints, evitando que hackers interceptem ou ouçam a comunicação. A implementação desse canal de comunicação seguro e resistente a bisbilhoteiros ocorre através da tecnologia Secure Sockets Layer (SSL) e de seu sucessor mais moderno, o Transport Layer Security (TLS). Recomenda-se sempre a adoção de padrões modernos, como o AES (Advanced Encryption Standard), e a utilização de chaves mais longas para dificultar a quebra da criptografia. No escopo do front-end, é vital compreender que os recursos de armazenamento de dados no lado do cliente (como o localStorage) salvam as informações no disco rígido do usuário na forma não criptografada. Por isso, dados armazenados localmente ficam vulneráveis a malwares, spywares e a usuários curiosos que compartilham o mesmo computador. Consequentemente, nenhuma forma de armazenamento no client-side deve ser usada para guardar senhas, dados bancários ou outras informações sigilosas.</p>
+
+      <h3>Auditoria e Monitoramento de Respostas</h3>
+      <p>Ao consumir serviços (especialmente APIs externas), a aplicação deve estar preparada para auditar retornos inesperados. Entradas e respostas errôneas muitas vezes não ocorrem por acaso e podem sinalizar uma tentativa de ataque em andamento.</p>
+      <p>A auditoria contínua e o monitoramento das respostas do servidor complementam a arquitetura de segurança da aplicação. É essencial criar mecanismos no código para monitorar as respostas recebidas pelas requisições às APIs, prestando atenção especial às respostas decorrentes de entradas errôneas. Ao documentar e analisar como uma API reage a anomalias, o desenvolvedor front-end consegue estabelecer um indicador de segurança, para detectar problemas antecipadamente. Na maioria dos casos, requisições errôneas frequentes não ocorrem por acaso e podem oferecer pistas claras sobre a origem de uma vulnerabilidade ou de uma tentativa ativa de ataque.</p>
+
+      <div class="callout callout-info">
+        <p><strong>Atividade Prática - "Caça ao Erro"</strong></p>
+        <p>Entregar aos alunos um trecho de código JavaScript fictício. Eles devem atuar como auditores para encontrar falhas.</p>
+      </div>
+    </section>
+
+    <section id="politicas-navegador" class="card">
+      <h2>Políticas do Navegador: O Guardião da Interface</h2>
+
+      <h3>Política de Mesma Origem (Same-Origin Policy)</h3>
+      <p>A política da mesma origem (same-origin policy) é uma restrição de segurança fundamental que delimita o conteúdo web com o qual o código JavaScript pode interagir. O navegador de Internet exige que os scripts sejam provenientes do mesmo domínio por razões de segurança, garantindo a proteção dos dados. Especificamente, esta política define que um script apenas pode ler as propriedades de documentos que tenham a mesma origem e que um site só poderá fazer solicitações em background (como requisições assíncronas) para serviços que estejam no exato mesmo domínio. Esta diretriz é crucial para proteger os utilizadores e evitar que código mal-intencionado leia ou altere os seus dados, o que poderia comprometer a privacidade ou resultar em fraudes.</p>
+
+      <h3>CORS (Cross-Origin Resource Sharing)</h3>
+      <p>Para flexibilizar esta restrição de forma segura e permitir a comunicação com APIs externas, utiliza-se o CORS (Cross-Origin Resource Sharing). O CORS permite que sites partilhem os seus dados de uma maneira que possibilita aos utilizadores incluí-los em interações diretamente no lado do cliente (client-side).</p>
+      <p>Para autorizar esta partilha, o servidor tem de responder com cabeçalhos HTTP específicos, tais como:</p>
+      <ul>
+        <li><code>Access-Control-Allow-Origin</code>: Permite o acesso exclusivamente para uma origem específica. É a prática mais segura para aplicações em produção;</li>
+        <li><code>Access-Control-Allow-Methods</code>: Ele especifica quais métodos HTTP (como GET, POST, PUT, DELETE, etc.) são permitidos ao acessar um recurso a partir de uma origem diferente daquela que o serviu;</li>
+        <li><code>Access-Control-Allow-Credentials</code>: Informa ao navegador se ele deve ou não expor a resposta de uma requisição de origem cruzada (cross-origin) ao código JavaScript do frontend quando credenciais são incluídas.</li>
+      </ul>
+      <p>Estes cabeçalhos definem quais os domínios de origem que estão autorizados a consumir os dados, se o envio de credenciais é permitido e quais os métodos HTTP são aceitos pelo serviço.</p>
+      <p>Além de viabilizar a comunicação entre domínios distintos, o CORS atua como uma robusta medida de defesa. Pode ser implementado para impedir que sites não autorizados executem tarefas prejudiciais contra uma API, bloqueando tentativas de ataques como o CSRF (Cross-Site Request Forgery), onde um invasor tenta explorar a confiança estabelecida num sistema (como um site bancário). Ao validar rigidamente as origens através destes cabeçalhos, o servidor assegura que a interface client-side interage exclusivamente num ambiente controlado e aprovado.</p>
+
+      <div class="callout callout-info">
+        <p><strong>Dinâmica - "O Porteiro do Servidor"</strong></p>
+        <p>Jogo de simulação onde os alunos representam o Navegador, o Cliente e o Servidor. Eles devem aprovar ou bloquear requisições imaginárias com base nos "crachás" (cabeçalhos CORS) apresentados, fundamentando suas decisões.</p>
+      </div>
+    </section>
+
+    <section id="autogestao-disciplina" class="card">
+      <h2>Autogestão e Disciplina: A Programação Defensiva</h2>
+
+      <h3>Desconfiança por Padrão</h3>
+      <p>Ao escrever uma aplicação, a disciplina fundamental do desenvolvedor deve ser assumir sempre que as entradas e saídas estão erradas, que o usuário tratará tudo de forma incorreta e que existe um invasor espiando as ações do sistema. Para evitar os problemas predominantes de segurança, os desenvolvedores precisam desenvolver um "verdadeiro senso de desconfiança", adotando a premissa absoluta de que qualquer dado que não tenha sido criado pessoalmente por eles não é confiável.</p>
+
+      <h3>Validação Rigorosa</h3>
+      <p>A validação no lado do cliente serve para a proteção do usuário e deve ser utilizada para mantê-lo satisfeito e produtivo. Tudo o que for feito para reduzir a frustração do usuário ao interagir com o sistema também reduzirá os custos de suporte da aplicação e mitigará falhas que geram preocupações com segurança. É imperativo aplicar um processo de sanitização rigoroso, que consiste em remover qualquer script, caractere estranho ou outras informações que não façam parte da resposta esperada a uma solicitação (por exemplo, bloquear letras em campos estritamente numéricos). Além da sanitização da entrada, garantir uma saída que codifique adequadamente os dados fornecidos pelo usuário ajuda a reduzir o potencial para ataques de Cross-site Scripting (XSS).</p>
+
+      <h3>Sandbox e Resiliência</h3>
+      <p>Todo código ou recurso de terceiros carrega riscos inerentes; executar JavaScript fora de um ambiente de sandbox (caixa de areia) abre margem para que hackers executem truques sujos na aplicação. Colocar o consumo da API em uma sandbox ou em um ambiente virtual controlado possibilita controlar precisamente as ações que a API pode executar, os recursos a que ela pode acessar e, principalmente, como a aplicação interage com ela. O uso de uma zona de segurança de API permite não apenas restringir entradas indesejadas que poderiam causar efeitos desastrosos, mas também testar o código da interface sob diversas condições anômalas - como o envio proposital de dados inválidos ou simulações de sobrecarga -, garantindo que a resiliência do sistema funcione conforme o esperado.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; SENAI — Serviço Nacional de Aprendizagem Industrial.</p>
+  </footer>
+
+  <script>
+    console.log("Página da Aula 09 carregada com sucesso!");
+  </script>
+</body>
+</html>
